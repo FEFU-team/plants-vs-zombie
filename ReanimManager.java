@@ -60,7 +60,7 @@ public class ReanimManager {
         }
     }
 
-    public GreenfootImage generateSprite(String reanimKey, int frameIndex) {
+    public GreenfootImage generateSprite(String reanimKey, float frameIndex) {
         Reanim reanim = reanims.get(reanimKey);
         if (reanim == null || frameIndex < 0) {
             return new GreenfootImage(1, 1);
@@ -68,7 +68,6 @@ public class ReanimManager {
 
         int canvasW = 300;
         int canvasH = 300;
-
         BufferedImage canvas = new BufferedImage(canvasW, canvasH, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = canvas.createGraphics();
 
@@ -79,23 +78,47 @@ public class ReanimManager {
         int originY = canvasH / 2;
 
         for (ReanimTrack track : reanim.tracks) {
-            var f = track.frames.get(frameIndex);
+            int frameA = (int) Math.floor(frameIndex);
 
-            if (f == null || f.f == null || f.f == -1) continue;
+            if (frameA < track.firstFrame || frameA > track.lastFrame) {
+                continue;
+            }
+            
+            int frameB = (frameA == track.lastFrame)
+                ? track.firstFrame
+                : frameA + 1;
+            float t = frameIndex - frameA;
+            
+            //frameB = frameA;
+            //t = 0;
+            
+            var f1 = track.frames.get(frameA);
+            var f2 = (frameB < track.frames.size()) ? track.frames.get(frameB) : f1;
 
-            GreenfootImage gfImg = images.get(f.image);
+            if (f1 == null || f1.f == null || f1.f == -1) continue;
+
+            GreenfootImage gfImg = images.get(f1.image);
             if (gfImg == null) continue;
 
             BufferedImage img = gfImg.getAwtImage();
 
-            double x = f.x != null ? f.x : 0;
-            double y = f.y != null ? f.y : 0;
-
-            double sx = f.sx != null ? f.sx : 1.0;
-            double sy = f.sy != null ? f.sy : 1.0;
-
-            double kx = f.kx != null ? Math.toRadians(f.kx) : 0;
-            double ky = f.ky != null ? Math.toRadians(f.ky) : 0;
+            double x = lerp(f1.x != null ? f1.x : 0, f2.x != null ? f2.x : 0, t);
+            double y = lerp(f1.y != null ? f1.y : 0, f2.y != null ? f2.y : 0, t);
+    
+            double sx = lerp(f1.sx != null ? f1.sx : 1.0, f2.sx != null ? f2.sx : 1.0, t);
+            double sy = lerp(f1.sy != null ? f1.sy : 1.0, f2.sy != null ? f2.sy : 1.0, t);
+    
+            double kx = Math.toRadians(lerp(
+                f1.kx != null ? f1.kx : 0,
+                f2.kx != null ? f2.kx : 0,
+                t
+            ));
+    
+            double ky = Math.toRadians(lerp(
+                f1.ky != null ? f1.ky : 0,
+                f2.ky != null ? f2.ky : 0,
+                t
+            ));
 
             int w = img.getWidth();
             int h = img.getHeight();
@@ -122,18 +145,32 @@ public class ReanimManager {
         return createGreenfootImageFromAwt(canvas);
     }
 
-    public int getNextFrame(String key, String state, int currentFrame) {
+    public float getNextFrame(String key, String state, float currentFrame, float speed) {
         for (var track : reanims.get(key).tracks) {
             if (track.name.equals(state)) {
-                ++currentFrame;
+                currentFrame += speed;
+    
                 if (currentFrame < track.firstFrame || currentFrame > track.lastFrame) {
                     return track.firstFrame;
-                } else {
-                    return currentFrame;
                 }
+    
+                return currentFrame;
             }
         }
-        return -1;
+        return -1f;
+    }
+    
+    public float getFirstFrame(String key, String state) {
+        return getNextFrame(key, state, -1, 0);
+    }
+    
+    public float getFPS(String key) {
+        Reanim reanim = reanims.get(key);
+        if (reanim == null) {
+            return 0;
+        }
+        
+        return reanim.fps;
     }
 
     private static String toUpperSnakeCase(String input) {
@@ -152,5 +189,9 @@ public class ReanimManager {
         g.dispose();
 
         return gfImage;
+    }
+    
+    private double lerp(double a, double b, double t) {
+        return a + (b - a) * t;
     }
 }

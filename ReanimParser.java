@@ -23,7 +23,7 @@ public class ReanimParser {
 
         var reanim = new Reanim();
 
-        reanim.fps = Integer.parseInt(doc.getElementsByTagName("fps").item(0).getTextContent().split("\\.")[0]);
+        reanim.fps = Float.parseFloat(doc.getElementsByTagName("fps").item(0).getTextContent().split("\\.")[0]);
 
         NodeList tracks = doc.getElementsByTagName("track");
 

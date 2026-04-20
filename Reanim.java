@@ -1,6 +1,6 @@
 import java.util.*;
 
 public class Reanim {
-    int fps = 0;
+    float fps;
     List<ReanimTrack> tracks = new ArrayList<>();
 }
