@@ -2,14 +2,13 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
+import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.awt.Graphics;
 import greenfoot.*;
+import java.util.*;
 
 public class ReanimManager {
     private ReanimParser reanimParser = new ReanimParser();
@@ -60,9 +59,10 @@ public class ReanimManager {
         }
     }
 
-    public GreenfootImage generateSprite(String reanimKey, float frameIndex) {
+    public <T extends ReanimStateWithFrameIndex>
+    GreenfootImage generateSprite(String reanimKey, List<? extends ReanimStateWithFrameIndex> overlapStates, T state) {
         Reanim reanim = reanims.get(reanimKey);
-        if (reanim == null || frameIndex < 0) {
+        if (reanim == null || state.getCurrentFrame() < 0) {
             return new GreenfootImage(1, 1);
         }
 
@@ -76,66 +76,118 @@ public class ReanimManager {
 
         int originX = canvasW / 2;
         int originY = canvasH / 2;
+        
+        class TransformParams {
+            double x, y;
+            double sx, sy;
+            double kx, ky;
+            GreenfootImage gfImg;
+            
+            boolean fillWithFrame(ReanimTrack track, String state, float frameIndex, boolean needInterpolate) {
+                var frameA = (int) Math.floor(frameIndex);
+                if (frameA < track.firstFrame || frameA > track.lastFrame) {
+                    return false;
+                }
+                
+                float t = frameIndex - frameA;
+                
+                var f1 = track.frames.get(frameA);
+                if (f1 == null || f1.f == null || f1.f == -1) {
+                    return false;
+                }
+                
+                this.gfImg = images.get(f1.image);
+                if (gfImg == null) return false;
+                
+                var f2 = f1;
+                if (needInterpolate) {
+                    int frameB = (int)Math.floor(getNextFrame(reanimKey, state, frameA, 1));
+                    //int frameB = track.firstFrame + (frameA + 1 - track.firstFrame) % (track.lastFrame - track.firstFrame);
+                    
+                    if (frameB < track.frames.size() && track.frames.get(frameB).image == track.frames.get(frameA).image) {
+                        f2 = track.frames.get(frameB);
+                    }
+                }
+                
+                this.x = lerp(f1.x != null ? f1.x : 0, f2.x != null ? f2.x : 0, t);
+                this.y = lerp(f1.y != null ? f1.y : 0, f2.y != null ? f2.y : 0, t);
+        
+                this.sx = lerp(f1.sx != null ? f1.sx : 1.0, f2.sx != null ? f2.sx : 1.0, t);
+                this.sy = lerp(f1.sy != null ? f1.sy : 1.0, f2.sy != null ? f2.sy : 1.0, t);
+        
+                this.kx = Math.toRadians(lerp(
+                    f1.kx != null ? f1.kx : 0,
+                    f2.kx != null ? f2.kx : 0,
+                    t
+                ));
+        
+                this.ky = Math.toRadians(lerp(
+                    f1.ky != null ? f1.ky : 0,
+                    f2.ky != null ? f2.ky : 0,
+                    t
+                ));
+                
+                return true;
+            }
+            
+            BufferedImage getAwtImage() {
+                return gfImg.getAwtImage();
+            }
+            
+            AffineTransform getTransform() {
+                double a = Math.cos(kx) * sx;
+                double b = Math.sin(kx) * sx;
+                double c = -Math.sin(ky) * sy;
+                double d = Math.cos(ky) * sy;
+    
+                double tx = originX + x;
+                double ty = originY + y;
+    
+                return new AffineTransform(
+                    a, b,
+                    c, d,
+                    tx, ty
+                );
+            };
+        }
 
         for (ReanimTrack track : reanim.tracks) {
-            int frameA = (int) Math.floor(frameIndex);
-
-            if (frameA < track.firstFrame || frameA > track.lastFrame) {
+            var tp = new TransformParams();
+            if (!tp.fillWithFrame(track, state.getName(), state.getCurrentFrame(), true)) {
                 continue;
             }
             
-            int frameB = (frameA == track.lastFrame)
-                ? track.firstFrame
-                : frameA + 1;
-            float t = frameIndex - frameA;
+            var at = tp.getTransform();
             
-            //frameB = frameA;
-            //t = 0;
-            
-            var f1 = track.frames.get(frameA);
-            var f2 = (frameB < track.frames.size()) ? track.frames.get(frameB) : f1;
+            if (overlapStates != null) {
+                for (var overlapState : overlapStates) {
+                    var overlapParams = new TransformParams();
+                    if (!overlapParams.fillWithFrame(track, overlapState.getName(), overlapState.getCurrentFrame(), true)) {
+                        continue;
+                    }
+                    
+                    var initParams = new TransformParams();
+                    if (!initParams.fillWithFrame(track, overlapState.getName(), overlapState.getInitFrame(), false)) {
+                        continue;
+                    }
+                    
+                    tp.gfImg = overlapParams.gfImg;
+                    
+                    try {
+                        var transform = initParams.getTransform();
+                        transform.invert();
+                        transform.concatenate(overlapParams.getTransform());
+                        at.concatenate(transform);
+                    } catch (NoninvertibleTransformException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
 
-            if (f1 == null || f1.f == null || f1.f == -1) continue;
-
-            GreenfootImage gfImg = images.get(f1.image);
-            if (gfImg == null) continue;
-
-            BufferedImage img = gfImg.getAwtImage();
-
-            double x = lerp(f1.x != null ? f1.x : 0, f2.x != null ? f2.x : 0, t);
-            double y = lerp(f1.y != null ? f1.y : 0, f2.y != null ? f2.y : 0, t);
-    
-            double sx = lerp(f1.sx != null ? f1.sx : 1.0, f2.sx != null ? f2.sx : 1.0, t);
-            double sy = lerp(f1.sy != null ? f1.sy : 1.0, f2.sy != null ? f2.sy : 1.0, t);
-    
-            double kx = Math.toRadians(lerp(
-                f1.kx != null ? f1.kx : 0,
-                f2.kx != null ? f2.kx : 0,
-                t
-            ));
-    
-            double ky = Math.toRadians(lerp(
-                f1.ky != null ? f1.ky : 0,
-                f2.ky != null ? f2.ky : 0,
-                t
-            ));
+            BufferedImage img = tp.getAwtImage();
 
             int w = img.getWidth();
             int h = img.getHeight();
-
-            double a = Math.cos(kx) * sx;
-            double b = Math.sin(kx) * sx;
-            double c = -Math.sin(ky) * sy;
-            double d = Math.cos(ky) * sy;
-
-            double tx = originX + x;
-            double ty = originY + y;
-
-            AffineTransform at = new AffineTransform(
-                a, b,
-                c, d,
-                tx, ty
-            );
 
             g2d.drawImage(img, at, null);
         }
@@ -144,13 +196,23 @@ public class ReanimManager {
 
         return createGreenfootImageFromAwt(canvas);
     }
+    
+    private static double normalizeAngle(double a) {
+        while (a > Math.PI) a -= 2 * Math.PI;
+        while (a < -Math.PI) a += 2 * Math.PI;
+        return a;
+    }
 
-    public float getNextFrame(String key, String state, float currentFrame, float speed) {
+    public float getNextFrame(String key, String state, float currentFrame, float speed, boolean loop) {
         for (var track : reanims.get(key).tracks) {
             if (track.name.equals(state)) {
                 currentFrame += speed;
+                
+                if (currentFrame > track.lastFrame) {
+                    return loop ? track.firstFrame : -1.f;
+                }
     
-                if (currentFrame < track.firstFrame || currentFrame > track.lastFrame) {
+                if (currentFrame < track.firstFrame) {
                     return track.firstFrame;
                 }
     
@@ -158,6 +220,10 @@ public class ReanimManager {
             }
         }
         return -1f;
+    }
+    
+    public float getNextFrame(String key, String state, float currentFrame, float speed) {
+        return getNextFrame(key, state, currentFrame, speed, true);
     }
     
     public float getFirstFrame(String key, String state) {
