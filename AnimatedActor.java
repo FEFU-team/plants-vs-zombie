@@ -75,7 +75,7 @@ public class AnimatedActor extends Actor {
     public String getReanimState() {
         return reanimState.name;
     }
-
+    
     public float getFloatX() {
         return realX;
     }
@@ -101,7 +101,7 @@ public class AnimatedActor extends Actor {
 
     public void setLocation(float x, float y) {
         realX = x;
-        realX = y;
+        realY = y;
         super.setLocation((int)x, (int)y);
     }
 
