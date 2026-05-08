@@ -75,6 +75,10 @@ public class AnimatedActor extends Actor {
     public String getReanimState() {
         return reanimState.name;
     }
+
+    public float getReanimCurrentFrame() {
+        return reanimState != null ? reanimState.currentFrame : -1;
+    }
     
     public float getFloatX() {
         return realX;
@@ -120,8 +124,13 @@ public class AnimatedActor extends Actor {
     }
 
     public void setReanimState(String state) {
-        if (reanimState != null && !reanimState.equals(state)) {
+        setReanimState(state, true);
+    }
+
+    public void setReanimState(String state, boolean loop) {
+        if (reanimState != null && !reanimState.name.equals(state)) {
             reanimState.name = state;
+            reanimState.loop = loop;
             reanimState.currentFrame = reanimManager.getFirstFrame(this.reanimKey, this.reanimState.name);
             reanimOverlapStates.clear();
             lastUpdateTimeNanos = System.nanoTime();

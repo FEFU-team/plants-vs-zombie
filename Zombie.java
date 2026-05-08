@@ -111,13 +111,15 @@ public class Zombie extends AnimatedActor {
 
     }
     protected void checkDeathFinished() {
-
-
-        
+        // Проверяем, завершилась ли анимация смерти
+        // Если currentFrame стал отрицательным, значит анимация закончилась (loop=false)
+        if (getReanimCurrentFrame() < 0) {
+            getWorld().removeObject(this);
+        }
     }
     public void setState(State newState) {
         if (this.currentState == newState) return;
-        
+
         this.currentState = newState;
         this.attackTimer = 0;
 
@@ -125,7 +127,11 @@ public class Zombie extends AnimatedActor {
         switch (newState) {
             case WALKING: animBaseName = "anim_walk"; break;
             case EATING:  animBaseName = "anim_eat";  break;
-            case DEAD:    animBaseName = "anim_death"; break;
+            case DEAD:
+                animBaseName = "anim_death";
+                // Для анимации смерти отключаем зацикливание
+                setReanimState(getFullAnimName(), false);
+                return; // Выходим, чтобы не вызывать setReanimState ниже
             case IDLE:    animBaseName = "anim_idle"; break;
         }
 

@@ -66,7 +66,7 @@ public class ReanimManager {
             return new GreenfootImage(1, 1);
         }
 
-        int canvasW = 300;
+        int canvasW = 450;
         int canvasH = 300;
         BufferedImage canvas = new BufferedImage(canvasW, canvasH, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = canvas.createGraphics();
