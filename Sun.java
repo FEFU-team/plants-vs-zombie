@@ -44,8 +44,18 @@ public class Sun extends AnimatedActor {
     }
 
     private void checkClick() {
-        if (Greenfoot.mouseClicked(this)) {
-            collect();
+        if (Greenfoot.mouseClicked(null)) {
+            MouseInfo mouse = Greenfoot.getMouseInfo();
+            if (mouse != null) {
+                float left = getRealX() - COLLISION_BOX_WIDTH / 2.f;
+                float top = getRealY() - COLLISION_BOX_HEIGHT / 2.f;
+                int mouseX = mouse.getX();
+                int mouseY = mouse.getY();
+
+                if ((left <= mouseX && mouseX <= left + COLLISION_BOX_WIDTH) && (top <= mouseY && mouseY <= top + COLLISION_BOX_HEIGHT)) {
+                    collect();
+                }
+            }
         }
     }
 
