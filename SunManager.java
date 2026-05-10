@@ -33,7 +33,7 @@ public class SunManager {
         int randomX = MIN_X + random.nextInt(MAX_X - MIN_X);
         int randomTargetY = 100 + random.nextInt(GROUND_Y - 100);
 
-        Sun sun = new Sun(reanimManager, randomX, START_Y, randomTargetY);
+        Sun sun = new Sun(reanimManager,  randomTargetY);
         world.addObject(sun, randomX, START_Y);
     }
 
