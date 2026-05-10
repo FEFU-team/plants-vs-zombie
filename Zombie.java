@@ -27,7 +27,7 @@ public class Zombie extends AnimatedActor {
         this.armLossThreshold = hp / 2;
         
 
-        setState(State.WALKING); 
+        setState(State.WALKING);
     }
 
     @Override
@@ -60,14 +60,14 @@ public class Zombie extends AnimatedActor {
 
     protected void moveZombie() {
         // Плавное движение с использованием float координат из AnimatedActor
-        setLocation(getFloatX()-speed, getFloatY());
+        setLocation(getRealX()-speed, getRealY());
     }
 
     protected void checkForPlants() {
         List<Plant> plants = getWorld().getObjects(Plant.class);
         for (Plant plant : plants) {
-            float distanceX = getFloatX() - plant.getX();
-            float distanceY = Math.abs(getFloatY() - plant.getY());
+            float distanceX = getRealX() - plant.getX();
+            float distanceY = Math.abs(getRealY() - plant.getY());
 
             // Дистанция атаки (укуса)
             if (distanceY < 60 && distanceX > 0 && distanceX < 30) {

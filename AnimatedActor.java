@@ -80,11 +80,11 @@ public class AnimatedActor extends Actor {
         return reanimState != null ? reanimState.currentFrame : -1;
     }
     
-    public float getFloatX() {
+    public float getRealX() {
         return realX;
     }
 
-    public float getFloatY() {
+    public float getRealY() {
         return realY;
     }
 
