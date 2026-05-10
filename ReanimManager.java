@@ -7,6 +7,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.awt.Graphics;
+import java.awt.AlphaComposite;
 import greenfoot.*;
 import java.util.*;
 
@@ -81,6 +82,7 @@ public class ReanimManager {
             double x, y;
             double sx, sy;
             double kx, ky;
+            double alpha;
             GreenfootImage gfImg;
             
             boolean fillWithFrame(ReanimTrack track, String state, float frameIndex, boolean needInterpolate) {
@@ -127,6 +129,8 @@ public class ReanimManager {
                     t
                 ));
                 
+                this.alpha = lerp(f1.a != null ? f1.a : 1, f2.a != null ? f2.a : 1, t);
+                
                 return true;
             }
             
@@ -172,6 +176,7 @@ public class ReanimManager {
                     }
                     
                     tp.gfImg = overlapParams.gfImg;
+                    // TODO: Alpha?
                     
                     try {
                         var transform = initParams.getTransform();
@@ -184,12 +189,9 @@ public class ReanimManager {
                 }
             }
 
-            BufferedImage img = tp.getAwtImage();
-
-            int w = img.getWidth();
-            int h = img.getHeight();
-
-            g2d.drawImage(img, at, null);
+            AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)tp.alpha);
+            g2d.setComposite(ac);
+            g2d.drawImage(tp.getAwtImage(), at, null);
         }
 
         g2d.dispose();

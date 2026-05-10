@@ -48,6 +48,7 @@ public class ReanimParser {
                 frameObj.sy = getOptional(frame, "sy", Float::valueOf, previousFrame.sy);
                 frameObj.kx = getOptional(frame, "kx", Float::valueOf, previousFrame.kx);
                 frameObj.ky = getOptional(frame, "ky", Float::valueOf, previousFrame.ky);
+                frameObj.a = getOptional(frame, "a", Float::valueOf, previousFrame.a);
                 frameObj.f = getOptional(frame, "f", Integer::valueOf, previousFrame.f);
                 frameObj.image = getOptional(frame, "i", previousFrame.image);
 

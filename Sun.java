@@ -3,8 +3,8 @@ import greenfoot.*;
 public class Sun extends AnimatedActor {
     private static final int SUN_VALUE = 25;
     private static final float FALL_SPEED = 1.f;
-    private static final float COLLISION_BOX_WIDTH = 104.f;
-    private static final float COLLISION_BOX_HEIGHT = 104.f;
+    private static final float COLLISION_BOX_WIDTH = 100.f;
+    private static final float COLLISION_BOX_HEIGHT = 100.f;
     private static final int DISAPPEAR_TIME = 300;
 
     private int lifeTimer = 0;
