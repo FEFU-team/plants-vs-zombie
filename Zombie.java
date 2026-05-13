@@ -1,5 +1,6 @@
 import greenfoot.*;
 import java.util.List;
+import java.awt.Rectangle;
 
 public class Zombie extends AnimatedActor {
     
@@ -8,20 +9,40 @@ public class Zombie extends AnimatedActor {
     protected static final float CELL_WIDTH = 90; // TODO: adjust and move to more suitable place
     
     protected State currentState = State.IDLE;
-    protected int maxHp;
-    protected int currentHp;
+    protected float maxHp;
+    protected float currentHp;
     protected boolean lostArm = false;
-    protected int armLossThreshold;
+    protected float armLossThreshold;
 
     protected Timer moveTimer = new Timer();
     protected float moveSpeed;
-    protected int attackDamage = 10;
-    protected float attackInterval = 40;
+    protected float attackDamage = 100;
     protected Timer attackTimer = new Timer();
     
     protected String animBaseName = "anim_idle";
+    
+    @Override
+    public float getHitboxWidth() {
+        return 80;
+    }
+    
+    @Override
+    public float getHitboxHeight() {
+        return 90;
+    }
+    
+    @Override
+    public Rectangle.Float getHitbox() {
+        float width = getHitboxWidth();
+        float height = getHitboxHeight();
+        
+        return new Rectangle.Float(
+            getRealX() + 10, getRealY() + 50,
+            width, height
+        );
+    }
 
-    public Zombie(ReanimManager manager, String key, int hp, float moveSpeed) {
+    public Zombie(ReanimManager manager, String key, float hp, float moveSpeed) {
         super(manager, key);
         this.maxHp = hp;
         this.currentHp = hp;
@@ -49,13 +70,14 @@ public class Zombie extends AnimatedActor {
     @Override
     public void act() {
         if (currentState == State.DEAD) {
-            super.act();
-            
             if (getReanimCurrentFrame() < 0) {
-                // Animation finished
-                getWorld().removeObject(this);
+                var world = getWorld();
+                if (world != null) {
+                    world.removeObject(this);
+                }
             }
             
+            super.act();
             return;
         }
         
@@ -101,17 +123,20 @@ public class Zombie extends AnimatedActor {
     }
 
     protected void attackPlant() {
-        // TODO: manual check for intersecting plant, to not eat plants from up
-        var target = getOneIntersectingObject(Plant.class);
-        if (!(target instanceof Plant plant)) {
-            setState(State.WALKING);
-            return;
+        var world = getWorld();
+        if (world == null) return;
+        
+        var hitbox = getHitbox();
+        var attackDelta = attackTimer.getDeltaSecondsAndReset();
+        
+        for (var plant : world.getObjects(Plant.class)) {
+            if (hitbox.intersects(plant.getHitbox())) {
+                plant.takeDamage(attackDelta * attackDamage);
+                return;
+            }
         }
         
-        if (attackTimer.getDeltaSeconds() >= attackInterval) {
-            plant.takeDamage(attackDamage);
-            attackTimer.reset();
-        }
+        setState(State.WALKING);
     }
 
     public void takeDamage(int amount) {
@@ -135,8 +160,14 @@ public class Zombie extends AnimatedActor {
         this.currentState = newState;
 
         switch (newState) {
-            case WALKING -> animBaseName = "anim_walk";
-            case EATING -> animBaseName = "anim_eat";
+            case WALKING -> {
+                animBaseName = "anim_walk";
+                moveTimer.reset();
+            }
+            case EATING -> {
+                animBaseName = "anim_eat";
+                attackTimer.reset();
+            }
             case DEAD -> {
                 animBaseName = "anim_death";
                 setReanimState(getFullAnimName(), false);
@@ -155,16 +186,6 @@ public class Zombie extends AnimatedActor {
     protected void loseArm() {
         this.lostArm = true;
         setReanimState(getFullAnimName());
-    }
-
-    protected void checkDeathAnimation() {
-        if (currentState == State.DEAD) {
-            var world = getWorld();
-            
-            if (world != null) {
-                world.removeObject(this);
-            }
-        }
     }
     
     float getCellsPassedAndResetTimer() {

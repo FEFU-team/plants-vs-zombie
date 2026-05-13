@@ -2,7 +2,7 @@ import greenfoot.*;
 import java.util.*;
 import java.util.stream.*;
 
-public class AnimatedActor extends BaseActor {
+abstract public class AnimatedActor extends BaseActor {
     private class AnimationState implements ReanimStateWithFrameIndex {
         String name;
         float currentFrame;

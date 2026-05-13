@@ -12,12 +12,12 @@ public class Sun extends AnimatedActor {
     
     @Override
     public float getHitboxWidth() {
-        return 100;
+        return 80;
     }
     
     @Override
     public float getHitboxHeight() {
-        return 100;
+        return 80;
     }
     
     @Override

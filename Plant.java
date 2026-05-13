@@ -2,19 +2,19 @@ import greenfoot.*;
 
 
 public class Plant extends AnimatedActor {
-    private int health;
+    private float health;
     
     @Override
     public float getHitboxWidth() {
-        return 90; // TODO: adjust
+        return 80; // TODO: adjust
     }
     
     @Override
     public float getHitboxHeight() {
-        return 100; // TODO: adjust
+        return 90; // TODO: adjust
     }
 
-    public Plant(ReanimManager manager, String key, int health) {
+    public Plant(ReanimManager manager, String key, float health) {
         super(manager, key);
         
         this.health = health;
@@ -25,7 +25,7 @@ public class Plant extends AnimatedActor {
         super.act();
     }
     
-    public void takeDamage(int amount) {
+    public void takeDamage(float amount) {
         health -= amount;
         
         if (health <= 0) {

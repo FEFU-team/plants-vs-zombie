@@ -7,7 +7,7 @@ public class SunFlower extends Plant {
     private Timer sunSpawnTimer = new Timer();
     
     public SunFlower(ReanimManager manager) {
-        super(manager, "REANIM_SUNFLOWER", 100);
+        super(manager, "REANIM_SUNFLOWER", 300);
         
         setReanimState("anim_idle");
         updateFrame();
