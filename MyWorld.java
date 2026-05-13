@@ -4,10 +4,13 @@ public class MyWorld extends World {
     private ReanimManager reanimManager = new ReanimManager();
     private SunManager sunManager;
     private Actor sunCounterDisplay;
+    private boolean isPaused = true;
 
     public MyWorld() {
         super(600, 400, 1);
         Greenfoot.setSpeed(50);
+
+        setPaintOrder(Sun.class, Zombie.class, Plant.class);
 
         reanimManager.loadReanims("./reanim", "REANIM_");
         reanimManager.loadImages("./images/reanim", "IMAGE_REANIM_");
@@ -15,8 +18,10 @@ public class MyWorld extends World {
         addObject(new AnimatedActor(reanimManager, "REANIM_SUNFLOWER", "anim_idle"), 160, 0);
         addObject(new AnimatedActor(reanimManager, "REANIM_BLOVER", "anim_idle"), 240, 0);
         addObject(new AnimatedActor(reanimManager, "REANIM_CACTUS", "anim_idle"), 320, 0);
-        addObject(new Plant(reanimManager, "REANIM_SUNFLOWER"), 0, 240);
-        addObject(new Plant(reanimManager, "REANIM_SUNFLOWER"), 100, 120);
+        addObject(new AnimatedActor(reanimManager, "REANIM_CHOMPER", "anim_chew"), 400, 0);
+
+        addObject(new SunFlower(reanimManager), 0, 240);
+        addObject(new SunFlower(reanimManager), 100, 120);
 
         {
             // TODO: create subclasses for diffreent types of zombies

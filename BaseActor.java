@@ -1,4 +1,5 @@
 import greenfoot.*;
+import java.awt.Rectangle;
 
 public class BaseActor extends Actor {
     private float realX;
@@ -31,6 +32,21 @@ public class BaseActor extends Actor {
         realX = x;
         realY = y;
         super.setLocation((int)x, (int)y);
+    }
+    
+    public float getHitboxWidth() {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+    
+    public float getHitboxHeight() {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+    
+    public Rectangle.Float getHitbox() {
+        return new Rectangle.Float(
+            getRealX(), getRealY(),
+            getHitboxWidth(), getHitboxHeight()
+        );
     }
 
     public void lifecycleStop() {}

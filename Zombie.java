@@ -109,7 +109,7 @@ public class Zombie extends AnimatedActor {
         }
         
         if (attackTimer.getDeltaSeconds() >= attackInterval) {
-            // plant.takeDamage(attackDamage);
+            plant.takeDamage(attackDamage);
             attackTimer.reset();
         }
     }
