@@ -10,15 +10,15 @@ public class MyWorld extends World {
         super(600, 400, 1);
         Greenfoot.setSpeed(50);
 
-        setPaintOrder(Sun.class, Zombie.class, Plant.class);
+        setPaintOrder(HitboxMap.class, Sun.class, Zombie.class, Plant.class);
 
         reanimManager.loadReanims("./reanim", "REANIM_");
         reanimManager.loadImages("./images/reanim", "IMAGE_REANIM_");
-        addObject(new AnimatedActor(reanimManager, "REANIM_PEASHOOTERSINGLE", "anim_full_idle"), 80, 0);
+        /*addObject(new AnimatedActor(reanimManager, "REANIM_PEASHOOTERSINGLE", "anim_full_idle"), 80, 0);
         addObject(new AnimatedActor(reanimManager, "REANIM_SUNFLOWER", "anim_idle"), 160, 0);
         addObject(new AnimatedActor(reanimManager, "REANIM_BLOVER", "anim_idle"), 240, 0);
         addObject(new AnimatedActor(reanimManager, "REANIM_CACTUS", "anim_idle"), 320, 0);
-        addObject(new AnimatedActor(reanimManager, "REANIM_CHOMPER", "anim_chew"), 400, 0);
+        addObject(new AnimatedActor(reanimManager, "REANIM_CHOMPER", "anim_chew"), 400, 0);*/
 
         addObject(new SunFlower(reanimManager), 0, 240);
         addObject(new SunFlower(reanimManager), 100, 120);
@@ -41,6 +41,9 @@ public class MyWorld extends World {
         sunCounterDisplay = new Actor() {};
         sunCounterDisplay.setImage(sunManager.getCounterImage());
         addObject(sunCounterDisplay, 40, 40);
+        
+        // Debug: draw hitboxes
+        addObject(new HitboxMap(), getWidth() / 2, getHeight() / 2);
     }
 
     @Override
