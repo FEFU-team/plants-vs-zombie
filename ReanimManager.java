@@ -63,7 +63,7 @@ public class ReanimManager {
     public <T extends ReanimStateWithFrameIndex>
     GreenfootImage generateSprite(String reanimKey, List<? extends ReanimStateWithFrameIndex> overlapStates, T state) {
         Reanim reanim = reanims.get(reanimKey);
-        if (reanim == null || state.getCurrentFrame() < 0) {
+        if (reanim == null || state.getCurrentFrame() < 0 || state.getName() == null) {
             return new GreenfootImage(1, 1);
         }
 
@@ -206,6 +206,10 @@ public class ReanimManager {
     }
 
     public float getNextFrame(String key, String state, float currentFrame, float speed, boolean loop) {
+        if (key == null || state == null) {
+            return -1.f;
+        }
+        
         for (var track : reanims.get(key).tracks) {
             if (track.name.equals(state)) {
                 currentFrame += speed;
@@ -221,7 +225,7 @@ public class ReanimManager {
                 return currentFrame;
             }
         }
-        return -1f;
+        return -1.f;
     }
     
     public float getNextFrame(String key, String state, float currentFrame, float speed) {

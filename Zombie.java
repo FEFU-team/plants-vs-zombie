@@ -5,62 +5,82 @@ public class Zombie extends AnimatedActor {
     
     public enum State { IDLE, WALKING, EATING, DEAD }
 
+    protected static final float CELL_WIDTH = 90; // TODO: adjust and move to more suitable place
+    
     protected State currentState = State.IDLE;
     protected int maxHp;
     protected int currentHp;
     protected boolean lostArm = false;
     protected int armLossThreshold;
 
-    protected float speed;
+    protected Timer moveTimer = new Timer();
+    protected float moveSpeed;
     protected int attackDamage = 10;
-    protected int attackInterval = 40;
-    protected int attackTimer = 0;
+    protected float attackInterval = 40;
+    protected Timer attackTimer = new Timer();
     
     protected String animBaseName = "anim_idle";
 
-    public Zombie(ReanimManager manager, String key, int hp, float speed) {
-        // Базово зомби создается в IDLE, но конструктор переключает его в WALKING
-        super(manager, key, "anim_idle");
+    public Zombie(ReanimManager manager, String key, int hp, float moveSpeed) {
+        super(manager, key);
         this.maxHp = hp;
         this.currentHp = hp;
-        this.speed = speed;
+        this.moveSpeed = moveSpeed;
         this.armLossThreshold = hp / 2;
-        
 
         setState(State.WALKING);
+        updateFrame();
+    }
+    
+    @Override
+    public void lifecycleStop() {
+        super.lifecycleStop();
+        moveTimer.stop();
+        attackTimer.stop();
     }
 
     @Override
+    public void lifecycleStart() {
+        super.lifecycleStart();
+        moveTimer.start();
+        attackTimer.start();
+    }
+    
+    @Override
     public void act() {
         if (currentState == State.DEAD) {
-            super.act(); 
-            checkDeathFinished();
+            super.act();
+            
+            if (getReanimCurrentFrame() < 0) {
+                // Animation finished
+                getWorld().removeObject(this);
+            }
+            
             return;
         }
-        handleStateLogic();
         
+        handleStateLogic();
 
         super.act(); 
     }
 
     protected void handleStateLogic() {
         switch (currentState) {
-            case WALKING:
+            case WALKING -> {
                 moveZombie();
                 checkForPlants();
-                break;
-            case EATING:
-                eatLogic();
-                break;
-            case IDLE:
+            }
+            case EATING -> {
+                attackPlant();
+            }
+            case IDLE -> {
                 checkForPlants(); 
-                break;
+            }
         }
     }
 
     protected void moveZombie() {
-        // Плавное движение с использованием float координат из AnimatedActor
-        setLocation(getRealX()-speed, getRealY());
+        setLocation(getRealX() - getCellsPassedAndResetTimer() * CELL_WIDTH, getRealY());
     }
 
     protected void checkForPlants() {
@@ -80,17 +100,17 @@ public class Zombie extends AnimatedActor {
         }
     }
 
-    protected void eatLogic() {
-        Actor plant = getOneIntersectingObject(Plant.class);
-        if (plant == null) {
+    protected void attackPlant() {
+        // TODO: manual check for intersecting plant, to not eat plants from up
+        var target = getOneIntersectingObject(Plant.class);
+        if (!(target instanceof Plant plant)) {
             setState(State.WALKING);
             return;
         }
         
-        attackTimer++;
-        if (attackTimer >= attackInterval) {
-            // Здесь будет вызов урона растению: ((Plant)plant).takeDamage(attackDamage);
-            attackTimer = 0;
+        if (attackTimer.getDeltaSeconds() >= attackInterval) {
+            // plant.takeDamage(attackDamage);
+            attackTimer.reset();
         }
     }
 
@@ -99,43 +119,32 @@ public class Zombie extends AnimatedActor {
         
         currentHp -= amount;
         
-        // Проверка потери руки
         if (!lostArm && currentHp <= armLossThreshold) {
             loseArm();
         }
 
-        // При здоровье 0 переходим в состояние DEAD
         if (currentHp <= 0) {
             setState(State.DEAD);
         }
 
     }
-    protected void checkDeathFinished() {
-        // Проверяем, завершилась ли анимация смерти
-        // Если currentFrame стал отрицательным, значит анимация закончилась (loop=false)
-        if (getReanimCurrentFrame() < 0) {
-            getWorld().removeObject(this);
-        }
-    }
+    
     public void setState(State newState) {
         if (this.currentState == newState) return;
 
         this.currentState = newState;
-        this.attackTimer = 0;
 
-        // Привязка состояний к именам анимаций в .reanim файле
         switch (newState) {
-            case WALKING: animBaseName = "anim_walk"; break;
-            case EATING:  animBaseName = "anim_eat";  break;
-            case DEAD:
+            case WALKING -> animBaseName = "anim_walk";
+            case EATING -> animBaseName = "anim_eat";
+            case DEAD -> {
                 animBaseName = "anim_death";
-                // Для анимации смерти отключаем зацикливание
                 setReanimState(getFullAnimName(), false);
-                return; // Выходим, чтобы не вызывать setReanimState ниже
-            case IDLE:    animBaseName = "anim_idle"; break;
+                return;
+            }
+            case IDLE -> animBaseName = "anim_idle";
         }
 
-        // Синхронизация визуального ряда через базовый класс
         setReanimState(getFullAnimName());
     }
 
@@ -149,10 +158,16 @@ public class Zombie extends AnimatedActor {
     }
 
     protected void checkDeathAnimation() {
-
         if (currentState == State.DEAD) {
-
-            getWorld().removeObject(this);
+            var world = getWorld();
+            
+            if (world != null) {
+                world.removeObject(this);
+            }
         }
+    }
+    
+    float getCellsPassedAndResetTimer() {
+        return moveTimer.getDeltaSecondsAndReset() * moveSpeed;
     }
 }

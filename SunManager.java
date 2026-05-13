@@ -33,7 +33,7 @@ public class SunManager {
         int randomX = MIN_X + random.nextInt(MAX_X - MIN_X);
         int randomTargetY = 100 + random.nextInt(GROUND_Y - 100);
 
-        Sun sun = new Sun(reanimManager,  randomTargetY);
+        Sun sun = new Sun(reanimManager, randomTargetY);
         world.addObject(sun, randomX, START_Y);
     }
 
@@ -61,10 +61,8 @@ public class SunManager {
         counterImage = new GreenfootImage(sunBank.getWidth(), sunBank.getHeight());
         counterImage.drawImage(sunBank, 0, 0);
 
-
         counterImage.setColor(Color.BLACK);
         counterImage.setFont(new Font(20));
-
 
         String sunText = String.valueOf(sunCount);
         int textWidth = counterImage.getFont().getSize() * sunText.length() / 2;
