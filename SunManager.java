@@ -5,7 +5,7 @@ public class SunManager {
     private static final int SPAWN_INTERVAL = 300;
     private static final int MIN_X = 50;
     private static final int MAX_X = 550;
-    private static final int START_Y = 0; 
+    private static final int START_Y = 0;
     private static final int GROUND_Y = 350;
 
     private MyWorld world;
@@ -14,14 +14,21 @@ public class SunManager {
     private int spawnTimer = 0;
     private Random random = new Random();
     private GreenfootImage counterImage;
+    private Actor sunCounterDisplay;
 
     public SunManager(MyWorld world, ReanimManager reanimManager) {
         this.world = world;
         this.reanimManager = reanimManager;
         updateCounterDisplay();
+
+        sunCounterDisplay = new Actor() {};
+        sunCounterDisplay.setImage(getCounterImage());
+        world.addObject(sunCounterDisplay, 40, 40);
     }
 
     public void act() {
+        sunCounterDisplay.setImage(getCounterImage());
+
         spawnTimer++;
         if (spawnTimer >= SPAWN_INTERVAL) {
             spawnTimer = 0;
@@ -67,7 +74,7 @@ public class SunManager {
         String sunText = String.valueOf(sunCount);
         int textWidth = counterImage.getFont().getSize() * sunText.length() / 2;
         int textX = (sunBank.getWidth() - textWidth) / 2;
-        int textY = sunBank.getHeight() - 8; 
+        int textY = sunBank.getHeight() - 8;
 
         counterImage.drawString(sunText, textX, textY);
     }
