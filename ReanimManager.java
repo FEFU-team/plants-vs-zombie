@@ -241,8 +241,12 @@ public class ReanimManager {
         if (reanim == null) {
             return 0;
         }
-        
+
         return reanim.fps;
+    }
+
+    public GreenfootImage getImage(String key) {
+        return images.get(key);
     }
 
     private static String toUpperSnakeCase(String input) {
