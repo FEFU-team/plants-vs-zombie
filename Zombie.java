@@ -6,6 +6,9 @@ public class Zombie extends AnimatedActor {
     
     public enum State { IDLE, WALKING, EATING, DEAD }
 
+    public static final float LEFT_INDENT = 10;
+    public static final float TOP_HEIGHT = 50;
+    
     protected static final float CELL_WIDTH = 90; // TODO: adjust and move to more suitable place
     
     protected State currentState = State.IDLE;
@@ -28,7 +31,7 @@ public class Zombie extends AnimatedActor {
     
     @Override
     public float getHitboxHeight() {
-        return 90;
+        return 80;
     }
     
     @Override
@@ -37,7 +40,7 @@ public class Zombie extends AnimatedActor {
         float height = getHitboxHeight();
         
         return new Rectangle.Float(
-            getRealX() + 10, getRealY() + 50,
+            getRealX() + LEFT_INDENT, getRealY() + TOP_HEIGHT + 5,
             width, height
         );
     }
@@ -106,13 +109,12 @@ public class Zombie extends AnimatedActor {
     }
 
     protected void checkForPlants() {
-        List<Plant> plants = getWorld().getObjects(Plant.class);
-        for (Plant plant : plants) {
+        var hitbox = getHitbox();
+        
+        for (Plant plant : getWorld().getObjects(Plant.class)) {
             float distanceX = getRealX() - plant.getX();
-            float distanceY = Math.abs(getRealY() - plant.getY());
 
-            // Дистанция атаки (укуса)
-            if (distanceY < 60 && distanceX > 0 && distanceX < 30) {
+            if (hitbox.intersects(plant.getHitbox()) && distanceX > 0 && distanceX < 30) {
                 setState(State.EATING);
                 return;
             }
