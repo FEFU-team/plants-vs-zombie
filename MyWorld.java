@@ -14,15 +14,18 @@ public class MyWorld extends World {
 
         reanimManager.loadReanims("./reanim", "REANIM_");
         reanimManager.loadImages("./images/reanim", "IMAGE_REANIM_");
+
         /*addObject(new AnimatedActor(reanimManager, "REANIM_PEASHOOTERSINGLE", "anim_full_idle"), 80, 0);
         addObject(new AnimatedActor(reanimManager, "REANIM_SUNFLOWER", "anim_idle"), 160, 0);
         addObject(new AnimatedActor(reanimManager, "REANIM_BLOVER", "anim_idle"), 240, 0);
         addObject(new AnimatedActor(reanimManager, "REANIM_CACTUS", "anim_idle"), 320, 0);
         addObject(new AnimatedActor(reanimManager, "REANIM_CHOMPER", "anim_chew"), 400, 0);*/
 
-        addObject(new SunFlower(reanimManager), 0, 240);
+        addObject(new SunFlower(reanimManager), 100, 240);
         addObject(new SunFlower(reanimManager), 100, 120);
-
+        addObject(new SunFlower(reanimManager), 400, 120);
+        addObject(new LawnMower(reanimManager, "REANIM_LAWNMOWER"), 0, 120);
+        addObject(new LawnMower(reanimManager, "REANIM_LAWNMOWER"), 0, 240);
         {
             // TODO: create subclasses for diffreent types of zombies
             // TODO: maybe add pauses in move cycle like in original
@@ -36,6 +39,7 @@ public class MyWorld extends World {
             addObject(zombie, 240, 190);
         }
 
+        //addObject(new ZombiesWon(reanimManager), 400, 120);
         // Инициализация системы солнышек
         sunManager = new SunManager(this, reanimManager);
         sunCounterDisplay = new Actor() {};
