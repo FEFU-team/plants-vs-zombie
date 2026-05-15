@@ -1,13 +1,12 @@
 import greenfoot.*;
 import java.util.List;
 
-public class LawnMower extends AnimatedActor
-{
+public class LawnMower extends AnimatedActor {
     public enum State { IDLE, TRIGGERED }
 
     private State currentState = State.IDLE;
     private Timer moveTimer = new Timer();
-    private float moveSpeed = 3.0f; // Скорость движения газонокосилки (в клетках в секунду)
+    private float moveSpeed = 3.f;
     private static final float CELL_WIDTH = 90;
 
     @Override
@@ -55,12 +54,10 @@ public class LawnMower extends AnimatedActor
         var world = getWorld();
         if (world == null) return;
 
-        List<Zombie> zombies = world.getObjects(Zombie.class);
-        for (Zombie zombie : zombies) {
-            float distanceY = Math.abs(getRealY() - zombie.getRealY());
-            float distanceX = zombie.getRealX() - getRealX();
+        var hitbox = getHitbox();
 
-            if (distanceY < 60 && distanceX > -20 && distanceX < 60) {
+        for (Zombie zombie : world.getObjects(Zombie.class)) {
+            if (hitbox.intersects(zombie.getHitbox())) {
                 trigger();
                 return;
             }
@@ -83,9 +80,8 @@ public class LawnMower extends AnimatedActor
         if (world == null) return;
 
         var hitbox = getHitbox();
-        List<Zombie> zombies = world.getObjects(Zombie.class);
 
-        for (Zombie zombie : zombies) {
+        for (Zombie zombie : world.getObjects(Zombie.class)) {
             if (hitbox.intersects(zombie.getHitbox())) {
                 zombie.takeDamage(999999);
 
