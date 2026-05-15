@@ -3,14 +3,14 @@ import java.util.List;
 import java.awt.Rectangle;
 
 public class Zombie extends AnimatedActor {
-    
+
     public enum State { IDLE, WALKING, EATING, DEAD }
 
     public static final float LEFT_INDENT = 10;
     public static final float TOP_HEIGHT = 50;
-    
+
     protected static final float CELL_WIDTH = 90; // TODO: adjust and move to more suitable place
-    
+
     protected State currentState = State.IDLE;
     protected float maxHp;
     protected float currentHp;
@@ -21,24 +21,24 @@ public class Zombie extends AnimatedActor {
     protected float moveSpeed;
     protected float attackDamage = 100;
     protected Timer attackTimer = new Timer();
-    
+
     protected String animBaseName = "anim_idle";
-    
+
     @Override
     public float getHitboxWidth() {
         return 80;
     }
-    
+
     @Override
     public float getHitboxHeight() {
         return 80;
     }
-    
+
     @Override
     public Rectangle.Float getHitbox() {
         float width = getHitboxWidth();
         float height = getHitboxHeight();
-        
+
         return new Rectangle.Float(
             getRealX() + LEFT_INDENT, getRealY() + TOP_HEIGHT + 5,
             width, height
@@ -55,7 +55,7 @@ public class Zombie extends AnimatedActor {
         setState(State.WALKING);
         updateFrame();
     }
-    
+
     @Override
     public void lifecycleStop() {
         super.lifecycleStop();
@@ -69,7 +69,7 @@ public class Zombie extends AnimatedActor {
         moveTimer.start();
         attackTimer.start();
     }
-    
+
     @Override
     public void act() {
         if (currentState == State.DEAD) {
@@ -79,14 +79,14 @@ public class Zombie extends AnimatedActor {
                     world.removeObject(this);
                 }
             }
-            
+
             super.act();
             return;
         }
-        
+
         handleStateLogic();
 
-        super.act(); 
+        super.act();
     }
 
     protected void handleStateLogic() {
@@ -99,7 +99,7 @@ public class Zombie extends AnimatedActor {
                 attackPlant();
             }
             case IDLE -> {
-                checkForPlants(); 
+                checkForPlants();
             }
         }
     }
@@ -110,7 +110,7 @@ public class Zombie extends AnimatedActor {
 
     protected void checkForPlants() {
         var hitbox = getHitbox();
-        
+
         for (Plant plant : getWorld().getObjects(Plant.class)) {
             float distanceX = getRealX() - plant.getX();
 
@@ -127,25 +127,25 @@ public class Zombie extends AnimatedActor {
     protected void attackPlant() {
         var world = getWorld();
         if (world == null) return;
-        
+
         var hitbox = getHitbox();
         var attackDelta = attackTimer.getDeltaSecondsAndReset();
-        
+
         for (var plant : world.getObjects(Plant.class)) {
             if (hitbox.intersects(plant.getHitbox())) {
                 plant.takeDamage(attackDelta * attackDamage);
                 return;
             }
         }
-        
+
         setState(State.WALKING);
     }
 
-    public void takeDamage(int amount) {
+    public void takeDamage(float amount) {
         if (currentState == State.DEAD) return;
-        
+
         currentHp -= amount;
-        
+
         if (!lostArm && currentHp <= armLossThreshold) {
             loseArm();
         }
@@ -153,9 +153,8 @@ public class Zombie extends AnimatedActor {
         if (currentHp <= 0) {
             setState(State.DEAD);
         }
-
     }
-    
+
     public void setState(State newState) {
         if (this.currentState == newState) return;
 
@@ -172,25 +171,25 @@ public class Zombie extends AnimatedActor {
             }
             case DEAD -> {
                 animBaseName = "anim_death";
-                setReanimState(getFullAnimName(), false);
+                setReanimState(animBaseName, false);
                 return;
             }
             case IDLE -> animBaseName = "anim_idle";
         }
 
-        setReanimState(getFullAnimName());
-    }
-
-    protected String getFullAnimName() {
-        return lostArm ? animBaseName + "_noarm" : animBaseName;
+        setReanimState(animBaseName);
     }
 
     protected void loseArm() {
         this.lostArm = true;
-        setReanimState(getFullAnimName());
+        // setReanimState(animBaseName); // TODO: maybe should just hide hand layer
     }
-    
+
     float getCellsPassedAndResetTimer() {
         return moveTimer.getDeltaSecondsAndReset() * moveSpeed;
+    }
+
+    boolean isAlive() {
+        return currentState != State.DEAD;
     }
 }

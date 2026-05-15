@@ -9,28 +9,31 @@ public class MyWorld extends World {
         super(600, 400, 1);
         Greenfoot.setSpeed(50);
 
-        setPaintOrder(HitboxMap.class, Sun.class, Zombie.class, Plant.class);
+        setPaintOrder(
+            HitboxMap.class,
+            Sun.class,
+            PeaProjectile.class,
+            Zombie.class,
+            Plant.class
+        );
 
         reanimManager.loadReanims("./reanim", "REANIM_");
+        reanimManager.loadImages("./images", "IMAGE_");
         reanimManager.loadImages("./images/reanim", "IMAGE_REANIM_");
 
-        /*addObject(new AnimatedActor(reanimManager, "REANIM_PEASHOOTERSINGLE", "anim_full_idle"), 80, 0);
-        addObject(new AnimatedActor(reanimManager, "REANIM_SUNFLOWER", "anim_idle"), 160, 0);
-        addObject(new AnimatedActor(reanimManager, "REANIM_BLOVER", "anim_idle"), 240, 0);
-        addObject(new AnimatedActor(reanimManager, "REANIM_CACTUS", "anim_idle"), 320, 0);
-        addObject(new AnimatedActor(reanimManager, "REANIM_CHOMPER", "anim_chew"), 400, 0);*/
-
-        addObject(new PeaShooter(reanimManager), 100, 120);
-        addObject(new SunFlower(reanimManager), 190, 120);
-        addObject(new WallNut(reanimManager), 280, 120);
-        addObject(new SunFlower(reanimManager), 100, 210);
-        addObject(new PotatoMine(reanimManager), 100, 300);
-        addObject(new Chomper(reanimManager), 190, 300);
         addObject(new LawnMower(reanimManager, "REANIM_LAWNMOWER"), 0, 120);
+        addObject(new LawnMower(reanimManager, "REANIM_LAWNMOWER"), 0, 210);
         addObject(new LawnMower(reanimManager, "REANIM_LAWNMOWER"), 0, 300);
 
+        addObject(new PeaShooter(reanimManager), 90, 120);
+        addObject(new SunFlower(reanimManager), 180, 120);
+        addObject(new WallNut(reanimManager), 270, 120);
+        addObject(new SunFlower(reanimManager), 90, 210);
+        addObject(new PotatoMine(reanimManager), 90, 300);
+        addObject(new Chomper(reanimManager), 180, 300);
+
         {
-            // TODO: create subclasses for diffreent types of zombies
+            // TODO: create subclasses for different types of zombies
             // TODO: maybe add pauses in move cycle like in original
             var zombie = new Zombie(reanimManager, "REANIM_ZOMBIE_PAPER", 200, 1 / 4.7f);
             zombie.setReanimSpeed(1.4f);
@@ -46,9 +49,11 @@ public class MyWorld extends World {
 
         // Инициализация системы солнышек
         sunManager = new SunManager(this, reanimManager);
-        
+
         // Debug: draw hitboxes
-        addObject(new HitboxMap(), getWidth() / 2, getHeight() / 2);
+        var hitboxMap = new HitboxMap();
+        hitboxMap.toggleAttackBoxes(true);
+        addObject(hitboxMap, getWidth() / 2, getHeight() / 2);
     }
 
     @Override
