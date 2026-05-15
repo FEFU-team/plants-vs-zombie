@@ -34,7 +34,7 @@ public class MyWorld extends World {
             addObject(zombie, 280, 70);
         }
         {
-            var zombie = new Zombie(reanimManager, "REANIM_ZOMBIE_FOOTBALL", 200, 1 / 2.5f);
+            var zombie = new Zombie(reanimManager, "REANIM_ZOMBIE_POLEVAULTER", 200, 1 / 2.5f);
             zombie.setReanimSpeed(1.4f);
             addObject(zombie, 240, 190);
         }

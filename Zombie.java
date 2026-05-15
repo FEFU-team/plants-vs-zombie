@@ -48,7 +48,7 @@ public class Zombie extends AnimatedActor {
         this.currentHp = hp;
         this.moveSpeed = moveSpeed;
         this.armLossThreshold = hp / 2;
-
+        //setState(State.IDLE);
         setState(State.WALKING);
         updateFrame();
     }
@@ -155,7 +155,7 @@ public class Zombie extends AnimatedActor {
     }
     
     public void setState(State newState) {
-        if (this.currentState == newState) return;
+        //if (this.currentState == newState) return;
 
         this.currentState = newState;
 
@@ -173,7 +173,11 @@ public class Zombie extends AnimatedActor {
                 setReanimState(getFullAnimName(), false);
                 return;
             }
-            case IDLE -> animBaseName = "anim_idle";
+            case IDLE -> {
+                animBaseName = "anim_idle";
+
+            }
+            
         }
 
         setReanimState(getFullAnimName());
