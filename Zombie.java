@@ -4,14 +4,13 @@ import java.awt.Rectangle;
 
 public class Zombie extends AnimatedActor {
 
-    public enum State { IDLE, WALKING, EATING, DEAD }
+    public enum State implements ZombieState { IDLE, WALKING, EATING, DEAD }
 
     public static final float LEFT_INDENT = 10;
     public static final float TOP_HEIGHT = 50;
 
     protected static final float CELL_WIDTH = 90; // TODO: adjust and move to more suitable place
-
-    protected State currentState = State.IDLE;
+    protected ZombieState currentState = State.IDLE;
     protected float maxHp;
     protected float currentHp;
     protected boolean lostArm = false;
@@ -51,7 +50,6 @@ public class Zombie extends AnimatedActor {
         this.currentHp = hp;
         this.moveSpeed = moveSpeed;
         this.armLossThreshold = hp / 2;
-        //setState(State.IDLE);
         setState(State.WALKING);
         updateFrame();
     }
@@ -72,35 +70,27 @@ public class Zombie extends AnimatedActor {
 
     @Override
     public void act() {
-        if (currentState == State.DEAD) {
+        if (currentState == State.DEAD) { 
             if (getReanimCurrentFrame() < 0) {
                 var world = getWorld();
-                if (world != null) {
-                    world.removeObject(this);
-                }
+                if (world != null) world.removeObject(this);
             }
-
             super.act();
             return;
         }
 
         handleStateLogic();
-
         super.act();
     }
 
     protected void handleStateLogic() {
-        switch (currentState) {
-            case WALKING -> {
-                moveZombie();
-                checkForPlants();
-            }
-            case EATING -> {
-                attackPlant();
-            }
-            case IDLE -> {
-                checkForPlants();
-            }
+        if (currentState == State.WALKING) {
+            moveZombie();
+            checkForPlants();
+        } else if (currentState == State.EATING) {
+            attackPlant();
+        } else if (currentState == State.IDLE) {
+            checkForPlants();
         }
     }
 
@@ -124,6 +114,7 @@ public class Zombie extends AnimatedActor {
         }
     }
 
+    // ИСПРАВЛЕНО: Атакует только те растения, которые находятся строго впереди (distanceX > 0)
     protected void attackPlant() {
         var world = getWorld();
         if (world == null) return;
@@ -132,7 +123,9 @@ public class Zombie extends AnimatedActor {
         var attackDelta = attackTimer.getDeltaSecondsAndReset();
 
         for (var plant : world.getObjects(Plant.class)) {
-            if (hitbox.intersects(plant.getHitbox())) {
+            float distanceX = getRealX() - plant.getX();
+
+            if (hitbox.intersects(plant.getHitbox()) && distanceX > 0) {
                 plant.takeDamage(attackDelta * attackDamage);
                 return;
             }
@@ -155,38 +148,33 @@ public class Zombie extends AnimatedActor {
         }
     }
 
-    public void setState(State newState) {
-        //if (this.currentState == newState) return;
-
+    public void setState(ZombieState newState) {
         this.currentState = newState;
-
-        switch (newState) {
-            case WALKING -> {
-                animBaseName = "anim_walk";
-                moveTimer.reset();
+        if (newState instanceof State baseState) {
+            switch (baseState) {
+                case WALKING -> {
+                    animBaseName = "anim_walk";
+                    moveTimer.reset();
+                }
+                case EATING -> {
+                    animBaseName = "anim_eat";
+                    attackTimer.reset();
+                }
+                case DEAD -> {
+                    animBaseName = "anim_death";
+                    setReanimState(animBaseName, false);
+                    return;
+                }
+                case IDLE -> {
+                    animBaseName = "anim_idle";
+                }
             }
-            case EATING -> {
-                animBaseName = "anim_eat";
-                attackTimer.reset();
-            }
-            case DEAD -> {
-                animBaseName = "anim_death";
-                setReanimState(animBaseName, false);
-                return;
-            }
-            case IDLE -> {
-                animBaseName = "anim_idle";
-
-            }
-            
+            setReanimState(animBaseName);
         }
-
-        setReanimState(animBaseName);
     }
 
     protected void loseArm() {
         this.lostArm = true;
-        // setReanimState(animBaseName); // TODO: maybe should just hide hand layer
     }
 
     float getCellsPassedAndResetTimer() {

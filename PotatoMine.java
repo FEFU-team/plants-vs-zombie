@@ -8,7 +8,7 @@ public class PotatoMine extends Plant {
     public PotatoMine(ReanimManager manager) {
         super(manager, "REANIM_POTATOMINE", 300);
 
-        setReanimState("anim_armed");
+        setReanimState("anim_idle");
         updateFrame();
     }
 
