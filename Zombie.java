@@ -114,7 +114,6 @@ public class Zombie extends AnimatedActor {
         }
     }
 
-    // ИСПРАВЛЕНО: Атакует только те растения, которые находятся строго впереди (distanceX > 0)
     protected void attackPlant() {
         var world = getWorld();
         if (world == null) return;
