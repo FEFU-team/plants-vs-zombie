@@ -141,6 +141,7 @@ public class MyWorld extends World {
         if (level == WorldStyles.POOL_DAY || level == WorldStyles.POOL_NIGHT) {
             int dy = 90;
             addObject(new Door(level.name()),72,345);
+            addObject(new Pool(level.name()),615,360);
             for (int i = 0; i < 10; i++) {
                 for (int j = 0; j < 6; j++) {
                     if (i == 0) {
@@ -154,8 +155,19 @@ public class MyWorld extends World {
             }
         }
         else if (level == WorldStyles.ROOF_DAY || level == WorldStyles.ROOF_NIGHT) {
-                addObject(new Door(level.name()),110,135);
-                addObject(new Cell(true),425,205);
+            int dy = 90;
+            int startY = 215;
+            addObject(new Door(level.name()),110,135);
+            for (int i = 0; i < 9; i++) {
+                for (int j = 0; j < 5; j++) {
+                    if (i == 0) {
+                     addObject(new Cell(true),300+i*dx,startY+j*dy);   
+                    } else {
+                        addObject(new Cell(false),300+i*dx,startY+j*dy); 
+                    }
+                }
+                startY = (i < 4) ? startY-25 : startY;
+            }
             }
         else {
             int dy = 100;
