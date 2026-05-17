@@ -1,4 +1,4 @@
-public interface ReanimStateWithFrameIndex {
+public interface ReanimExtraState {
     String getName();
     
     float getCurrentFrame();

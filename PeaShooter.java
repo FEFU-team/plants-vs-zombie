@@ -13,6 +13,7 @@ public class PeaShooter extends Plant {
         super(manager, "REANIM_PEASHOOTERSINGLE", 300);
 
         setReanimState("anim_full_idle");
+        setReanimSpeed(1.3f);
         updateFrame();
     }
 
@@ -49,7 +50,13 @@ public class PeaShooter extends Plant {
             attackDelayActive = true;
             attackDelayTimer.start();
             attackTimer.reset();
-            setReanimSpecialState("anim_shooting", false);
+            setReanimExtraState(
+                new AnimationStateBuilder()
+                    .name("anim_shooting")
+                    .speed(1.3f)
+                    .loop(false)
+                    .build()
+            );
         }
 
         super.act();
