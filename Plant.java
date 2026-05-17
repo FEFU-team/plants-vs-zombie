@@ -2,7 +2,8 @@ import greenfoot.*;
 import java.awt.Rectangle;
 
 public class Plant extends AnimatedActor {
-    private float health;
+    protected float maxHealth;
+    protected float health;
 
     @Override
     public float getHitboxWidth() {
@@ -21,6 +22,7 @@ public class Plant extends AnimatedActor {
     public Plant(ReanimManager manager, String key, float health) {
         super(manager, key);
 
+        this.maxHealth = health;
         this.health = health;
     }
 

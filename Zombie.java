@@ -3,13 +3,13 @@ import java.util.List;
 import java.awt.Rectangle;
 
 public class Zombie extends AnimatedActor {
-
     public enum State implements ZombieState { IDLE, WALKING, EATING, DEAD }
 
     public static final float LEFT_INDENT = 10;
     public static final float TOP_HEIGHT = 50;
 
     protected static final float CELL_WIDTH = 90; // TODO: adjust and move to more suitable place
+
     protected ZombieState currentState = State.IDLE;
     protected float maxHp;
     protected float currentHp;
@@ -50,6 +50,8 @@ public class Zombie extends AnimatedActor {
         this.currentHp = hp;
         this.moveSpeed = moveSpeed;
         this.armLossThreshold = hp / 2;
+
+        setReanimSpeed(1.4f);
         setState(State.WALKING);
         updateFrame();
     }
@@ -70,7 +72,7 @@ public class Zombie extends AnimatedActor {
 
     @Override
     public void act() {
-        if (currentState == State.DEAD) { 
+        if (currentState == State.DEAD) {
             if (getReanimCurrentFrame() < 0) {
                 var world = getWorld();
                 if (world != null) world.removeObject(this);

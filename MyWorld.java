@@ -29,20 +29,23 @@ public class MyWorld extends World {
         addObject(new SunFlower(reanimManager), 180, 120);
         addObject(new WallNut(reanimManager), 270, 120);
         addObject(new SunFlower(reanimManager), 90, 210);
+        addObject(new WallNut(reanimManager), 270, 210);
         addObject(new PotatoMine(reanimManager), 90, 300);
         addObject(new Chomper(reanimManager), 180, 300);
 
         {
             // TODO: create subclasses for different types of zombies
             // TODO: maybe add pauses in move cycle like in original
-            var zombie = new Zombie(reanimManager, "REANIM_ZOMBIE", 200, 1 / 4.7f);
-            zombie.setReanimSpeed(1.4f);
-            addObject(zombie, 400, 120 - (int)Zombie.TOP_HEIGHT);
+            var zombie = new ZombieWithCone(reanimManager);
+            addObject(zombie, 520, 120 - (int)Zombie.TOP_HEIGHT);
         }
         {
-            var zombie = new Zombie_polevaulter(reanimManager, "REANIM_ZOMBIE_POLEVAULTER", 200, 1 / 2.5f);
-            zombie.setReanimSpeed(1.4f);
-            addObject(zombie, 400, 300- (int)Zombie_polevaulter.TOP_HEIGHT);
+            var zombie = new ZombiePolevaulter(reanimManager);
+            addObject(zombie, 400, 210 - (int)Zombie.TOP_HEIGHT);
+        }
+        {
+            var zombie = new ZombiePolevaulter(reanimManager);
+            addObject(zombie, 400, 300 - (int)Zombie.TOP_HEIGHT);
         }
 
         //addObject(new ZombiesWon(reanimManager), 400, 120);

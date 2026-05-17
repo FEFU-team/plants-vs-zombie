@@ -59,24 +59,40 @@ public class ReanimManager {
             }
         }
     }
+    
+    GreenfootImage createCanvas() {
+        return new GreenfootImage(450, 300);
+    }
 
-    public <T extends ReanimStateWithFrameIndex>
-    GreenfootImage generateSprite(String reanimKey, List<? extends ReanimStateWithFrameIndex> overlapStates, T state) {
+    GreenfootImage renderSprite(String reanimKey, ReanimRenderOptions options) {
+        var canvas = options.getCanvas();
+        
         Reanim reanim = reanims.get(reanimKey);
-        if (reanim == null || state.getCurrentFrame() < 0 || state.getName() == null) {
-            return new GreenfootImage(1, 1);
+        if (reanim == null) {
+            return canvas;
+        }
+        
+        var state = options.getMainState();
+        if (state.getCurrentFrame() < 0 || state.getName() == null) {
+            return canvas;
+        }
+        
+        if (canvas == null) {
+            canvas = createCanvas();
+        } else {
+            canvas.clear();
         }
 
-        int canvasW = 450;
-        int canvasH = 300;
-        BufferedImage canvas = new BufferedImage(canvasW, canvasH, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = canvas.createGraphics();
-
+        int canvasW = canvas.getWidth();
+        int canvasH = canvas.getHeight();
+        Graphics2D g2d = canvas.getAwtImage().createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         int originX = canvasW / 2;
         int originY = canvasH / 2;
+        
+        var imageSwaps = options.getImageSwaps();
         
         class TransformParams {
             double x, y;
@@ -86,7 +102,7 @@ public class ReanimManager {
             GreenfootImage gfImg;
             
             boolean fillWithFrame(ReanimTrack track, String state, float frameIndex, boolean needInterpolate) {
-                var frameA = (int) Math.floor(frameIndex);
+                var frameA = (int)Math.floor(frameIndex);
                 if (frameA < track.firstFrame || frameA > track.lastFrame) {
                     return false;
                 }
@@ -98,13 +114,12 @@ public class ReanimManager {
                     return false;
                 }
                 
-                this.gfImg = images.get(f1.image);
+                this.gfImg = images.get(imageSwaps.getOrDefault(f1.image, f1.image));
                 if (gfImg == null) return false;
                 
                 var f2 = f1;
                 if (needInterpolate) {
                     int frameB = (int)Math.floor(getNextFrame(reanimKey, state, frameA, 1));
-                    //int frameB = track.firstFrame + (frameA + 1 - track.firstFrame) % (track.lastFrame - track.firstFrame);
                     
                     if (frameB < track.frames.size() && track.frames.get(frameB).image == track.frames.get(frameA).image) {
                         f2 = track.frames.get(frameB);
@@ -154,8 +169,13 @@ public class ReanimManager {
                 );
             };
         }
+        
+        var extraStates = options.getExtraStates();
+        var hiddenLayers = options.getHiddenLayers();
 
         for (ReanimTrack track : reanim.tracks) {
+            if (hiddenLayers.contains(track.name)) continue;
+            
             var tp = new TransformParams();
             if (!tp.fillWithFrame(track, state.getName(), state.getCurrentFrame(), true)) {
                 continue;
@@ -163,8 +183,8 @@ public class ReanimManager {
             
             var at = tp.getTransform();
             
-            if (overlapStates != null) {
-                for (var overlapState : overlapStates) {
+            if (extraStates != null) {
+                for (var overlapState : extraStates) {
                     var overlapParams = new TransformParams();
                     if (!overlapParams.fillWithFrame(track, overlapState.getName(), overlapState.getCurrentFrame(), true)) {
                         continue;
@@ -196,7 +216,7 @@ public class ReanimManager {
 
         g2d.dispose();
 
-        return createGreenfootImageFromAwt(canvas);
+        return canvas;
     }
     
     private static double normalizeAngle(double a) {
@@ -251,20 +271,6 @@ public class ReanimManager {
 
     private static String toUpperSnakeCase(String input) {
         return input.toUpperCase().replaceAll("[^A-Z0-9]", "_");
-    }
-
-    public static GreenfootImage createGreenfootImageFromAwt(BufferedImage awtImage) {
-        int width = awtImage.getWidth(null);
-        int height = awtImage.getHeight(null);
-
-        GreenfootImage gfImage = new GreenfootImage(width, height);
-        BufferedImage backingBuffer = gfImage.getAwtImage();
-        Graphics g = backingBuffer.getGraphics();
-
-        g.drawImage(awtImage, 0, 0, null);
-        g.dispose();
-
-        return gfImage;
     }
     
     private double lerp(double a, double b, double t) {

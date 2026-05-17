@@ -1,21 +1,39 @@
 import greenfoot.*;
 
-public class Zombie_polevaulter extends Zombie {
-
-    public enum PolevaulterState implements ZombieState { 
-        RUNNING_WITH_POLE, 
-        JUMPING 
+public class ZombiePolevaulter extends Zombie {
+    public enum PolevaulterState implements ZombieState {
+        RUNNING_WITH_POLE,
+        JUMPING
     }
-    private static final float JUMP_DISTANCE = 130f;
-    private static final float JUMP_DURATION = 2.3f; 
-    
-    private Timer jumpTimer = new Timer();
-    private float jumpStartX; 
 
-    public Zombie_polevaulter(ReanimManager manager, String key, float hp, float moveSpeed) {
-        super(manager, key, hp, moveSpeed);
-        setState(PolevaulterState.RUNNING_WITH_POLE); 
+    private static final float JUMP_DISTANCE = CELL_WIDTH * 1.65f;
+    private static final float JUMP_DURATION = 2.3f;
+
+    private Timer jumpTimer = new Timer();
+    private float jumpStartX;
+
+    public ZombiePolevaulter(ReanimManager manager) {
+        super(manager, "REANIM_ZOMBIE_POLEVAULTER", 335, 1 / 2.5f);
+        setState(PolevaulterState.RUNNING_WITH_POLE);
         updateFrame();
+    }
+
+    @Override
+    public void lifecycleStop() {
+        super.lifecycleStop();
+
+        if (currentState == PolevaulterState.JUMPING) {
+            jumpTimer.stop();
+        }
+    }
+
+    @Override
+    public void lifecycleStart() {
+        super.lifecycleStart();
+        
+        if (currentState == PolevaulterState.JUMPING) {
+            jumpTimer.start();
+        }
     }
 
     @Override
@@ -26,17 +44,16 @@ public class Zombie_polevaulter extends Zombie {
         } else if (currentState == PolevaulterState.JUMPING) {
             handleJumpLogic();
         } else {
-            
             super.handleStateLogic();
         }
     }
 
     @Override
     public void setState(ZombieState newState) {
-        super.setState(newState); 
+        super.setState(newState);
 
         if (newState instanceof PolevaulterState pState) {
-            this.currentState = pState; 
+            this.currentState = pState;
 
             switch (pState) {
                 case RUNNING_WITH_POLE -> {
@@ -45,12 +62,12 @@ public class Zombie_polevaulter extends Zombie {
                 }
                 case JUMPING -> {
                     animBaseName = "anim_jump";
-                    jumpStartX = getRealX(); 
+                    jumpStartX = getRealX();
                     jumpTimer.reset();
                     jumpTimer.start();
                 }
             }
-            setReanimState(animBaseName, false); 
+            setReanimState(animBaseName, false);
         }
     }
 
@@ -59,8 +76,11 @@ public class Zombie_polevaulter extends Zombie {
     }
 
     protected void checkForPlantsToJump() {
+        var world = getWorld();
+        if (world == null) return;
+
         var hitbox = getHitbox();
-        for (Plant plant : getWorld().getObjects(Plant.class)) {
+        for (Plant plant : world.getObjects(Plant.class)) {
             float distanceX = getRealX() - plant.getX();
             if (hitbox.intersects(plant.getHitbox()) && distanceX > 0 && distanceX < 70) {
                 setState(PolevaulterState.JUMPING);
@@ -69,14 +89,15 @@ public class Zombie_polevaulter extends Zombie {
         }
     }
     protected void handleJumpLogic() {
-        float elapsed = jumpTimer.getDeltaSeconds(); 
+        float elapsed = jumpTimer.getDeltaSeconds();
 
         if (elapsed < JUMP_DURATION) {
-            setLocation(jumpStartX, getRealY()); 
+            setLocation(jumpStartX, getRealY());
         } else {
+            moveSpeed = 1 / 5.f;
             setLocation(jumpStartX - JUMP_DISTANCE, getRealY());
             jumpTimer.stop();
-            setState(Zombie.State.WALKING); 
+            setState(Zombie.State.WALKING);
         }
     }
 }
