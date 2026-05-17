@@ -36,4 +36,24 @@ public class Plant extends AnimatedActor {
             }
         }
     }
+    
+    protected Zombie findAttackTarget() {
+        var world = getWorld();
+        if (world == null) return null;
+
+        var attackHitbox = getAttackTargetBox();
+        if (attackHitbox == null) return null;
+
+        for (Zombie zombie : world.getObjects(Zombie.class)) {
+            if (zombie.isAlive() && attackHitbox.intersects(zombie.getHitbox())) {
+                return zombie;
+            }
+        }
+
+        return null;
+    }
+    
+    protected boolean checkAttackTargets() {
+        return findAttackTarget() != null;
+    }
 }

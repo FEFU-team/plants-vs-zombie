@@ -39,7 +39,7 @@ public class ZombiePolevaulter extends Zombie {
     @Override
     protected void handleStateLogic() {
         if (currentState == PolevaulterState.RUNNING_WITH_POLE) {
-            moveZombieFastWithPole();
+            moveZombie();
             checkForPlantsToJump();
         } else if (currentState == PolevaulterState.JUMPING) {
             handleJumpLogic();
@@ -71,10 +71,6 @@ public class ZombiePolevaulter extends Zombie {
         }
     }
 
-    protected void moveZombieFastWithPole() {
-        setLocation(getRealX() - getCellsPassedAndResetTimer() * CELL_WIDTH * 1.5f, getRealY());
-    }
-
     protected void checkForPlantsToJump() {
         var world = getWorld();
         if (world == null) return;
@@ -89,6 +85,7 @@ public class ZombiePolevaulter extends Zombie {
         }
     }
     protected void handleJumpLogic() {
+        // TODO: fix to jump over choper before be eaten
         float elapsed = jumpTimer.getDeltaSeconds();
 
         if (elapsed < JUMP_DURATION) {
