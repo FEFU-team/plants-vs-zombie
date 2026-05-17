@@ -1,0 +1,13 @@
+#BlueJ class context
+comment0.target=ReanimParser
+comment1.params=fileName
+comment1.target=Reanim\ parse(java.lang.String)
+comment2.params=parent\ tag
+comment2.target=java.lang.String\ getOptional(org.w3c.dom.Element,\ java.lang.String)
+comment3.params=parent\ tag\ defaultValue
+comment3.target=java.lang.String\ getOptional(org.w3c.dom.Element,\ java.lang.String,\ java.lang.String)
+comment4.params=parent\ tag\ parser
+comment4.target=java.lang.Object\ getOptional(org.w3c.dom.Element,\ java.lang.String,\ java.util.function.Function)
+comment5.params=parent\ tag\ parser\ defaultValue
+comment5.target=java.lang.Object\ getOptional(org.w3c.dom.Element,\ java.lang.String,\ java.util.function.Function,\ java.lang.Object)
+numComments=6

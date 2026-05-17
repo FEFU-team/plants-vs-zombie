@@ -1,0 +1,27 @@
+#BlueJ class context
+comment0.target=Sun
+comment1.params=
+comment1.target=float\ getHitboxWidth()
+comment10.params=
+comment10.target=void\ collect()
+comment11.params=
+comment11.target=void\ disappear()
+comment12.params=
+comment12.target=int\ getValue()
+comment2.params=
+comment2.target=float\ getHitboxHeight()
+comment3.params=
+comment3.target=java.awt.geom.Rectangle2D.Float\ getHitbox()
+comment4.params=reanimManager
+comment4.target=Sun(ReanimManager)
+comment5.params=reanimManager\ targetY
+comment5.target=Sun(ReanimManager,\ int)
+comment6.params=targetY
+comment6.target=void\ setTargetY(int)
+comment7.params=
+comment7.target=void\ act()
+comment8.params=
+comment8.target=void\ fall()
+comment9.params=
+comment9.target=void\ checkClick()
+numComments=13

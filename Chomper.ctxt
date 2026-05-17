@@ -1,0 +1,11 @@
+#BlueJ class context
+comment0.target=Chomper
+comment1.params=manager
+comment1.target=Chomper(ReanimManager)
+comment2.params=
+comment2.target=void\ lifecycleStop()
+comment3.params=
+comment3.target=void\ lifecycleStart()
+comment4.params=
+comment4.target=void\ act()
+numComments=5

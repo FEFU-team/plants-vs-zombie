@@ -1,0 +1,13 @@
+#BlueJ class context
+comment0.target=Plant
+comment1.params=
+comment1.target=float\ getHitboxWidth()
+comment2.params=
+comment2.target=float\ getHitboxHeight()
+comment3.params=
+comment3.target=java.awt.geom.Rectangle2D.Float\ getAttackTargetBox()
+comment4.params=manager\ key\ health
+comment4.target=Plant(ReanimManager,\ java.lang.String,\ float)
+comment5.params=amount
+comment5.target=void\ takeDamage(float)
+numComments=6

@@ -1,0 +1,27 @@
+#BlueJ class context
+comment0.target=ReanimManager
+comment1.params=dir\ keyPrefix
+comment1.target=void\ loadReanims(java.lang.String,\ java.lang.String)
+comment10.params=key
+comment10.target=greenfoot.GreenfootImage\ getImage(java.lang.String)
+comment11.params=input
+comment11.target=java.lang.String\ toUpperSnakeCase(java.lang.String)
+comment12.params=a\ b\ t
+comment12.target=double\ lerp(double,\ double,\ double)
+comment2.params=dir\ keyPrefix
+comment2.target=void\ loadImages(java.lang.String,\ java.lang.String)
+comment3.params=
+comment3.target=greenfoot.GreenfootImage\ createCanvas()
+comment4.params=reanimKey\ options
+comment4.target=greenfoot.GreenfootImage\ renderSprite(java.lang.String,\ ReanimRenderOptions)
+comment5.params=a
+comment5.target=double\ normalizeAngle(double)
+comment6.params=key\ state\ currentFrame\ speed\ loop
+comment6.target=float\ getNextFrame(java.lang.String,\ java.lang.String,\ float,\ float,\ boolean)
+comment7.params=key\ state\ currentFrame\ speed
+comment7.target=float\ getNextFrame(java.lang.String,\ java.lang.String,\ float,\ float)
+comment8.params=key\ state
+comment8.target=float\ getFirstFrame(java.lang.String,\ java.lang.String)
+comment9.params=key
+comment9.target=float\ getFPS(java.lang.String)
+numComments=13
