@@ -22,6 +22,7 @@ public class Zombie extends AnimatedActor {
     protected Timer attackTimer = new Timer();
 
     protected String animBaseName = "anim_idle";
+    protected boolean gotBrain = false;
 
     @Override
     public float getHitboxWidth() {
@@ -87,8 +88,27 @@ public class Zombie extends AnimatedActor {
 
     protected void handleStateLogic() {
         if (currentState == State.WALKING) {
-            moveZombie();
-            checkForPlants();
+            if (!winning()) {
+                moveZombie();
+                checkForPlants();
+            } else  {
+                List<Door> doors = getWorld().getObjects(Door.class);
+                if (!doors.isEmpty()) {
+                    Door mainDoor = doors.get(0);
+                    int distanceY = YDifference(mainDoor);
+                    int distanceX = XDifference(mainDoor);
+                    if (distanceY > 50) {
+                        setLocation(getRealX(),getRealY() + getCellsPassedAndResetTimer() * CELL_WIDTH);
+                    }
+                    else if (distanceY < 50) {
+                        setLocation(getRealX(),getRealY() - getCellsPassedAndResetTimer() * CELL_WIDTH);
+                    }
+                    else if (distanceX > -15){
+                        setLocation(getRealX() - getCellsPassedAndResetTimer() * CELL_WIDTH, getRealY());
+                    }
+                    else gotBrain = true;
+                }
+            }
         } else if (currentState == State.EATING) {
             attackPlant();
         } else if (currentState == State.IDLE) {
@@ -98,6 +118,28 @@ public class Zombie extends AnimatedActor {
 
     protected void moveZombie() {
         setLocation(getRealX() - getCellsPassedAndResetTimer() * CELL_WIDTH, getRealY());
+    }
+    
+    public int YDifference(Door main) {
+        List<Door> doors = getWorld().getObjects(Door.class);
+        Door door = doors.get(0);
+        return door.getY() - this.getY();
+    }
+    
+    public int XDifference(Door main) {
+        List<Door> doors = getWorld().getObjects(Door.class);
+        Door door = doors.get(0);
+        return door.getX() - this.getX();
+    }
+    
+    protected boolean winning() {
+        java.util.List<Cell> cellList = getWorld().getObjects(Cell.class);
+        for (Cell object : cellList) {
+            if ((this.getX()-object.getX() < -125) && object.getStatus() == true) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected void checkForPlants() {
@@ -149,9 +191,14 @@ public class Zombie extends AnimatedActor {
         }
     }
     
+    public boolean isZombieWon() {
+        return gotBrain;
+    }
+
+    
     public void instantKill() {
         currentHp = 0;
-        
+
         var world = getWorld();
         if (world != null) world.removeObject(this);
     }

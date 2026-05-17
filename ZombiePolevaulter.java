@@ -1,4 +1,5 @@
 import greenfoot.*;
+import java.util.List;
 
 public class ZombiePolevaulter extends Zombie {
     public enum PolevaulterState implements ZombieState {
@@ -39,8 +40,30 @@ public class ZombiePolevaulter extends Zombie {
     @Override
     protected void handleStateLogic() {
         if (currentState == PolevaulterState.RUNNING_WITH_POLE) {
-            moveZombie();
-            checkForPlantsToJump();
+            if (!winning()) {
+                moveZombie();
+                checkForPlantsToJump();
+            } else {
+                var world = getWorld();
+                if (world == null) return;
+
+                List<Door> doors = world.getObjects(Door.class);
+                if (!doors.isEmpty()) {
+                    Door mainDoor = doors.get(0);
+                    int distanceY = YDifference(mainDoor);
+                    int distanceX = XDifference(mainDoor);
+                    if (distanceY > 50) {
+                        setLocation(getRealX(),getRealY() + getCellsPassedAndResetTimer() * CELL_WIDTH);
+                    }
+                    else if (distanceY < 50) {
+                        setLocation(getRealX(),getRealY() - getCellsPassedAndResetTimer() * CELL_WIDTH);
+                    }
+                    else if (distanceX > -15){
+                        setLocation(getRealX() - getCellsPassedAndResetTimer() * CELL_WIDTH, getRealY());
+                    }
+                    else gotBrain = true;
+                }
+            }
         } else if (currentState == PolevaulterState.JUMPING) {
             handleJumpLogic();
         } else {

@@ -11,16 +11,16 @@ public class LawnMower extends AnimatedActor {
 
     @Override
     public float getHitboxWidth() {
-        return 80;
+        return 70;
     }
 
     @Override
     public float getHitboxHeight() {
-        return 90;
+        return 70;
     }
 
-    public LawnMower(ReanimManager manager, String key) {
-        super(manager, key);
+    public LawnMower(ReanimManager manager) {
+        super(manager, "REANIM_LAWNMOWER");
         setReanimState("anim_normal");
         updateFrame();
     }
@@ -39,7 +39,6 @@ public class LawnMower extends AnimatedActor {
 
     @Override
     public void act() {
-
         if (currentState == State.IDLE) {
             checkForZombies();
         } else if (currentState == State.TRIGGERED) {
@@ -57,7 +56,7 @@ public class LawnMower extends AnimatedActor {
         var hitbox = getHitbox();
 
         for (Zombie zombie : world.getObjects(Zombie.class)) {
-            if (hitbox.intersects(zombie.getHitbox())) {
+            if (hitbox.getX() <= zombie.getHitbox().getX() && hitbox.intersects(zombie.getHitbox())) {
                 trigger();
                 return;
             }
