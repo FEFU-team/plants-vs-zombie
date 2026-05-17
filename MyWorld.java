@@ -35,13 +35,15 @@ public class MyWorld extends World {
         {
             // TODO: create subclasses for different types of zombies
             // TODO: maybe add pauses in move cycle like in original
-            var zombie = new Zombie(reanimManager, "REANIM_ZOMBIE_PAPER", 200, 1 / 4.7f);
-            zombie.setReanimSpeed(1.4f);
-            addObject(zombie, 400, 120 - (int)Zombie.TOP_HEIGHT);
+            var zombie = new ZombieWithCone(reanimManager);
+            addObject(zombie, 500, 120 - (int)Zombie.TOP_HEIGHT);
         }
+        /*{
+            var zombie = new Zombie(reanimManager, "REANIM_ZOMBIE_PAPER", 200, 1 / 4.7f);
+            addObject(zombie, 400, 120 - (int)Zombie.TOP_HEIGHT);
+        }*/
         {
             var zombie = new Zombie(reanimManager, "REANIM_ZOMBIE_FOOTBALL", 200, 1 / 2.5f);
-            zombie.setReanimSpeed(1.4f);
             addObject(zombie, 240, 210 - (int)Zombie.TOP_HEIGHT);
         }
 

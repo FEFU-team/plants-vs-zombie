@@ -51,7 +51,8 @@ public class Zombie extends AnimatedActor {
         this.currentHp = hp;
         this.moveSpeed = moveSpeed;
         this.armLossThreshold = hp / 2;
-
+        
+        setReanimSpeed(1.4f);
         setState(State.WALKING);
         updateFrame();
     }
