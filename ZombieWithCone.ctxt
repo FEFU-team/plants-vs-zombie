@@ -1,7 +1,0 @@
-#BlueJ class context
-comment0.target=ZombieWithCone
-comment1.params=manager
-comment1.target=ZombieWithCone(ReanimManager)
-comment2.params=amount
-comment2.target=void\ takeDamage(float)
-numComments=3

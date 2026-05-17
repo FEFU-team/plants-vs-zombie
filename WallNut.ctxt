@@ -1,9 +1,0 @@
-#BlueJ class context
-comment0.target=WallNut
-comment1.params=manager
-comment1.target=WallNut(ReanimManager)
-comment2.params=
-comment2.target=void\ act()
-comment3.params=amount
-comment3.target=void\ takeDamage(float)
-numComments=4

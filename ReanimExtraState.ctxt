@@ -1,9 +1,0 @@
-#BlueJ class context
-comment0.target=ReanimExtraState
-comment1.params=
-comment1.target=java.lang.String\ getName()
-comment2.params=
-comment2.target=float\ getCurrentFrame()
-comment3.params=
-comment3.target=float\ getInitFrame()
-numComments=4
