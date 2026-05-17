@@ -12,7 +12,7 @@ public class MyWorld extends World {
     private boolean isPaused = true;
     private int waves = 0;
     private int timer = 1800;
-    private int messageTimer = 600;
+    private int messageTimer = 300;
     private int currentWave = 0;
     
     private enum WorldStyles {
@@ -64,13 +64,13 @@ public class MyWorld extends World {
         setBackground(style.getBg());
         createLawn(style);
         
-        growPlant(SunFlower::new, 0, 0);
+        /*growPlant(SunFlower::new, 0, 0);
         growPlant(PeaShooter::new, 1, 0);
         growPlant(WallNut::new, 5, 0);
         growPlant(WallNut::new, 3, 2);
         growPlant(SunFlower::new, 0, 3);
         growPlant(PotatoMine::new, 5, 3);
-        growPlant(Chomper::new, 4, 3);
+        growPlant(Chomper::new, 4, 3);*/
 
         /*{
             // TODO: maybe add pauses in move cycle like in original
@@ -161,21 +161,21 @@ public class MyWorld extends World {
             timer = 1800;
             currentWave++;
             showText("The wave "+currentWave+ " has begun!",500,200);
-            messageTimer = 600;
+            messageTimer = 300;
             Random random = new Random();
             ZombieType[] types = ZombieType.values();
             for (int i = 0; i < random.nextInt(8); i++) {
                 ZombieType type = types[random.nextInt(types.length)];
-                int cellIndex = random.nextInt(5);
+                int cellIndex = random.nextInt(4);
                 switch (type) {
                     case Basic:
-                        addObject(new BasicZombie(reanimManager),1010,85+90*(cellIndex) - (int)Zombie.TOP_HEIGHT);
+                        addObject(new BasicZombie(reanimManager),1010+i*CELL_GRID_START_Y/5,CELL_GRID_START_Y + (int)(2.1 * Cell.HEIGHT) - (int)Zombie.TOP_HEIGHT + CELL_GRID_START_Y*(cellIndex));
                         break;
                     case WithCone:
-                        addObject(new ZombieWithCone(reanimManager),1005,85+90*(cellIndex) - (int)Zombie.TOP_HEIGHT);
+                        addObject(new ZombieWithCone(reanimManager),1005+i*CELL_GRID_START_Y/5,CELL_GRID_START_Y + (int)(0.1 * Cell.HEIGHT) - (int)Zombie.TOP_HEIGHT + CELL_GRID_START_Y*(cellIndex));
                         break;
                     case Polevaulter:
-                        addObject(new ZombiePolevaulter(reanimManager),1008,85+90*(cellIndex) - (int)Zombie.TOP_HEIGHT);
+                        addObject(new ZombiePolevaulter(reanimManager),1008+i*CELL_GRID_START_Y/5,CELL_GRID_START_Y + (int)(2.1 * Cell.HEIGHT) - (int)Zombie.TOP_HEIGHT + CELL_GRID_START_Y*(cellIndex));
                         break;
                 }
             } 
@@ -205,7 +205,7 @@ public class MyWorld extends World {
             final var cellGridX = CELL_GRID_START_X + Cell.WIDTH / 2;
             final var cellGridY = CELL_GRID_START_Y + Cell.HEIGHT / 2;
             
-            addObject(new Door(level.name()), 132, 345);
+            addObject(new Door(level.name()), 145, 335);
             
             for (int i = 0; i < 10; i++) {
                 for (int j = 0; j < 5; j++) {

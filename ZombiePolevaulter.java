@@ -58,7 +58,7 @@ public class ZombiePolevaulter extends Zombie {
                     else if (distanceY < 50) {
                         setLocation(getRealX(),getRealY() - getCellsPassedAndResetTimer() * CELL_WIDTH);
                     }
-                    else if (distanceX > -15){
+                    else if (distanceX <= 0){
                         setLocation(getRealX() - getCellsPassedAndResetTimer() * CELL_WIDTH, getRealY());
                     }
                     else gotBrain = true;

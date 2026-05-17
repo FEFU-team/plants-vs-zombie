@@ -103,7 +103,7 @@ public class Zombie extends AnimatedActor {
                     else if (distanceY < 50) {
                         setLocation(getRealX(),getRealY() - getCellsPassedAndResetTimer() * CELL_WIDTH);
                     }
-                    else if (distanceX > -15){
+                    else if (distanceX <= 0){
                         setLocation(getRealX() - getCellsPassedAndResetTimer() * CELL_WIDTH, getRealY());
                     }
                     else gotBrain = true;
@@ -135,7 +135,7 @@ public class Zombie extends AnimatedActor {
     protected boolean winning() {
         java.util.List<Cell> cellList = getWorld().getObjects(Cell.class);
         for (Cell object : cellList) {
-            if ((this.getX()-object.getX() < -125) && object.getStatus() == true) {
+            if ((this.getX()-object.getX() < -55) && object.getStatus() == true) {
                 return true;
             }
         }
