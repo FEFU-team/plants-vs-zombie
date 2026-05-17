@@ -12,7 +12,7 @@ public class MyWorld extends World {
     private boolean isPaused = true;
     private int waves = 0;
     private int timer = 1800;
-    private int messageTimer = 1200;
+    private int messageTimer = 600;
     private int currentWave = 0;
     
     private enum WorldStyles {
@@ -123,7 +123,7 @@ public class MyWorld extends World {
         showText("" + messageTimer,50,50);
         
         
-        if (messageTimer > 0) {
+        if (messageTimer < 0) {
         showText("",500,200);
         }
         if (timer <= 0) {
@@ -161,7 +161,7 @@ public class MyWorld extends World {
             timer = 1800;
             currentWave++;
             showText("The wave "+currentWave+ " has begun!",500,200);
-            messageTimer = 1200;
+            messageTimer = 600;
             Random random = new Random();
             ZombieType[] types = ZombieType.values();
             for (int i = 0; i < random.nextInt(8); i++) {
