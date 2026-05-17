@@ -143,7 +143,6 @@ public class MyWorld extends World {
         } else if (level == WorldStyles.ROOF_DAY || level == WorldStyles.ROOF_NIGHT) {
             // addObject(new Door(level.name()), 110, 135);
             
-            // 
             // TODO: maybe add but i think it's too hard for our project
         } else {
             final var cellGridX = CELL_GRID_START_X + Cell.WIDTH / 2;
