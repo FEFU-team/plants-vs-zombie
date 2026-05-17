@@ -57,7 +57,7 @@ public class LawnMower extends AnimatedActor {
         var hitbox = getHitbox();
 
         for (Zombie zombie : world.getObjects(Zombie.class)) {
-            if (hitbox.intersects(zombie.getHitbox())) {
+            if (hitbox.getX() <= (zombie.getHitbox().getX()) && hitbox.intersects(zombie.getHitbox())) {
                 trigger();
                 return;
             }
