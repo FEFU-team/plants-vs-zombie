@@ -195,6 +195,14 @@ public class Zombie extends AnimatedActor {
         return gotBrain;
     }
 
+    
+    public void instantKill() {
+        currentHp = 0;
+
+        var world = getWorld();
+        if (world != null) world.removeObject(this);
+    }
+
     public void setState(ZombieState newState) {
         this.currentState = newState;
         if (newState instanceof State baseState) {

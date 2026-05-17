@@ -1,32 +1,26 @@
-import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
+import greenfoot.*;
 
-/**
- * Write a description of class Lawn here.
- * 
- * @author (your name) 
- * @version (a version number or a date)
- */
-public class Cell extends Actor
-{   
-    private int width = 80;
-    private int height = 90;
+public class Cell extends Actor {
+    public static final int WIDTH = 80;
+    public static final int HEIGHT = 100;
+    
     private boolean finish = false;
-    public Cell(boolean s) {
-        GreenfootImage img = new GreenfootImage(width,height);
-        finish = (s == true) ? true : false;
-        //Для тестов
+
+    public Cell(boolean finish) {
+        GreenfootImage img = new GreenfootImage(WIDTH, HEIGHT);
+        this.finish = finish;
+
+        // Для тестов
         img.setColor(Color.RED);
-        img.drawRect(0, 0, width - 1, height - 1);
-        //
+        img.drawRect(0, 0, WIDTH - 1, HEIGHT - 1);
+
         setImage(img);
     }
-    
+
     public boolean getStatus() {
         return finish;
     }
-    
-    public void act()
-    {
-    
+
+    public void act() {
     }
 }

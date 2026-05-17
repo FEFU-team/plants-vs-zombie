@@ -1,17 +1,11 @@
-import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
+import greenfoot.*;
 import java.util.List;
-/**
- * Write a description of class Door here.
- * 
- * @author (your name) 
- * @version (a version number or a date)
- */
-public class Door extends Actor
-{
+
+public class Door extends Actor {
     private enum DoorStyles {
         BARREN("background1_gameover_interior_overlay.png"),
-        DEFAULT_DAY("background1_gameover_interior_overlay.png"),
-        DEFAULT_NIGHT("background2_gameover_interior_overlay.png"),
+        GARDEN_DAY("background1_gameover_interior_overlay.png"),
+        GARDEN_NIGHT("background2_gameover_interior_overlay.png"),
         POOL_DAY("background3_gameover_interior_overlay.png"),
         POOL_NIGHT("background4_gameover_interior_overlay.png"),
         ROOF_DAY("background5_gameover_mask.png"),

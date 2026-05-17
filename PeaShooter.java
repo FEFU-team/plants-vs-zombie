@@ -76,21 +76,6 @@ public class PeaShooter extends Plant {
         );
     }
 
-    public boolean checkAttackTargets() {
-        var world = getWorld();
-        if (world == null) return false;
-
-        var attackHitbox = getAttackTargetBox();
-
-        for (Zombie zombie : world.getObjects(Zombie.class)) {
-            if (zombie.isAlive() && attackHitbox.intersects(zombie.getHitbox())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public void shoot() {
         var world = getWorld();
         if (world != null) {
