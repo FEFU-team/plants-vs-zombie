@@ -58,7 +58,6 @@ public class MyWorld extends World {
         hitboxMap.toggleAttackBoxes(true);
         addObject(hitboxMap, getWidth() / 2, getHeight() / 2);
     }
-
     @Override
     public void stopped() {
         isPaused = true;
@@ -78,6 +77,7 @@ public class MyWorld extends World {
     @Override
     public void act() {
         sunManager.act();
+        
     }
 
     @Override
