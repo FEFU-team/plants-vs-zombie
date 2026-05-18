@@ -1,45 +1,13 @@
 import greenfoot.*;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
-import java.util.Random;
+import java.util.stream.*;
 
 public class MyWorld extends World {
-    private static final int CELL_GRID_START_X = 170;
-    private static final int CELL_GRID_START_Y = 80;
-    
     private ReanimManager reanimManager = new ReanimManager();
     private SunManager sunManager;
+    private Level level;
     private boolean isPaused = true;
-    private int waves = 0;
-    private int timer = 1800;
-    private int messageTimer = 300;
-    private int currentWave = 0;
-    
-    private enum WorldStyles {
-        BARREN("background1unsodded.jpg"),
-        GARDEN_DAY("background1.jpg"),
-        GARDEN_NIGHT("background2.jpg"),
-        POOL_DAY("background3.jpg"),
-        POOL_NIGHT("background4.jpg"),
-        ROOF_DAY("background5.jpg"),
-        ROOF_NIGHT("background6boss.jpg");
-        
-        private String bg;
-        
-        WorldStyles(String bg) {
-            this.bg = bg;
-        }
-        
-        public String getBg() {
-            return bg;
-        }
-    }
-    
-    private enum ZombieType {
-        Basic,
-        WithCone,
-        Polevaulter
-    }
 
     public MyWorld() {
         super(1000, 600, 1);
@@ -58,11 +26,19 @@ public class MyWorld extends World {
         reanimManager.loadImages("./images/reanim", "IMAGE_REANIM_");
 
         // Для тестов конкретный уровень и сложность
-        WorldStyles style = WorldStyles.GARDEN_NIGHT;
-        waves = 3;
-        
-        setBackground(style.getBg());
-        createLawn(style);
+        level = new Level(
+            this,
+            reanimManager,
+            new Level.WavesBuilder()
+                .addWave(6, 10.f)
+                .addWave(10, 180.f)
+                .build()
+        );
+        level.setStyle(Level.Style.GARDEN_NIGHT);
+        level.createLawn();
+        // TODO: random single zombies between waves
+        // TODO: wave timeline visualization
+        // TODO: specify types and probabilities of zombies in wave
         
         /*growPlant(SunFlower::new, 0, 0);
         growPlant(PeaShooter::new, 1, 0);
@@ -101,6 +77,8 @@ public class MyWorld extends World {
         for (var actor : getObjects(BaseActor.class)) {
             actor.lifecycleStop();
         }
+        
+        level.lifecycleStop();
     }
 
     @Override
@@ -109,34 +87,25 @@ public class MyWorld extends World {
         for (var actor : getObjects(BaseActor.class)) {
             actor.lifecycleStart();
         }
+        
+        level.lifecycleStart();
     }
 
     @Override
     public void act() {
-        timer--;
-        messageTimer--;
         sunManager.act();
+        level.act();
         checkGameStatus();
-        
-        //Тесты
-        showText("" + timer,50,20);
-        showText("" + messageTimer,50,50);
-        
-        
-        if (messageTimer < 0) {
-        showText("",500,200);
-        }
-        if (timer <= 0) {
-            createWavesOfZombies(waves);
-        }
     }
     
     void checkGameStatus() {
-        var zombies = this.getObjects(Zombie.class);
+        // TODO: move to Level and rewrite
+        /*var zombies = this.getObjects(Zombie.class);
         if (zombies.isEmpty() && currentWave == waves) {
             showText("Victory!", 500, 300);
             Greenfoot.stop();
         }
+        
         for (Zombie zombie : zombies) {
             if (zombie.isZombieWon()) {
                 this.removeObject(zombie);
@@ -144,7 +113,7 @@ public class MyWorld extends World {
                 Greenfoot.stop();
                 
             }
-        }
+        }*/
     }
 
     @Override
@@ -155,71 +124,12 @@ public class MyWorld extends World {
         }
     }
     
-    public void createWavesOfZombies(int waves) {
-        List<Zombie> zombies = this.getObjects(Zombie.class);
-        if (zombies.isEmpty() && currentWave < waves) {
-            timer = 1800;
-            currentWave++;
-            showText("The wave "+currentWave+ " has begun!",500,200);
-            messageTimer = 300;
-            Random random = new Random();
-            ZombieType[] types = ZombieType.values();
-            for (int i = 0; i < random.nextInt(8); i++) {
-                ZombieType type = types[random.nextInt(types.length)];
-                int cellIndex = random.nextInt(4);
-                switch (type) {
-                    case Basic:
-                        addObject(new BasicZombie(reanimManager),1010+i*CELL_GRID_START_Y/5,CELL_GRID_START_Y + (int)(2.1 * Cell.HEIGHT) - (int)Zombie.TOP_HEIGHT + CELL_GRID_START_Y*(cellIndex));
-                        break;
-                    case WithCone:
-                        addObject(new ZombieWithCone(reanimManager),1005+i*CELL_GRID_START_Y/5,CELL_GRID_START_Y + (int)(0.1 * Cell.HEIGHT) - (int)Zombie.TOP_HEIGHT + CELL_GRID_START_Y*(cellIndex));
-                        break;
-                    case Polevaulter:
-                        addObject(new ZombiePolevaulter(reanimManager),1008+i*CELL_GRID_START_Y/5,CELL_GRID_START_Y + (int)(2.1 * Cell.HEIGHT) - (int)Zombie.TOP_HEIGHT + CELL_GRID_START_Y*(cellIndex));
-                        break;
-                }
-            } 
-        }
-    }
-    
     void growPlant(Function<ReanimManager, ? extends Plant> create, int x, int y) {
-        addObject(create.apply(reanimManager), CELL_GRID_START_X + (x + 1) * Cell.WIDTH, CELL_GRID_START_Y + y * Cell.HEIGHT);
+        // TODO: move to Level
+        //addObject(create.apply(reanimManager), CELL_GRID_START_X + (x + 1) * Cell.WIDTH, CELL_GRID_START_Y + y * Cell.HEIGHT);
     }
 
     public SunManager getSunManager() {
         return sunManager;
-    }
-    
-    void createLawn(WorldStyles level) {
-        if (level == WorldStyles.POOL_DAY || level == WorldStyles.POOL_NIGHT) {
-            // addObject(new Door(level.name()), 72, 345);
-            
-            // TODO: maybe add but i think it's too hard for our project
-            // Pool levels have 6 rows instead of 5
-            // Also need to render pool, and draw swimming zombies
-        } else if (level == WorldStyles.ROOF_DAY || level == WorldStyles.ROOF_NIGHT) {
-            // addObject(new Door(level.name()), 110, 135);
-            
-            // TODO: maybe add but i think it's too hard for our project
-        } else {
-            final var cellGridX = CELL_GRID_START_X + Cell.WIDTH / 2;
-            final var cellGridY = CELL_GRID_START_Y + Cell.HEIGHT / 2;
-            
-            addObject(new Door(level.name()), 145, 335);
-            
-            for (int i = 0; i < 10; i++) {
-                for (int j = 0; j < 5; j++) {
-                    if (i == 0) {
-                        var lawnMower = new LawnMower(reanimManager);
-                        addObject(
-                            lawnMower,
-                            CELL_GRID_START_X + (int)(Cell.WIDTH * 0.1f),
-                            CELL_GRID_START_Y + (int)((j + 0.3f) * Cell.HEIGHT)
-                        );
-                    }
-                    addObject(new Cell(i == 0), cellGridX + i * Cell.WIDTH, cellGridY + j * Cell.HEIGHT);
-                }
-            }
-        }
     }
 }
