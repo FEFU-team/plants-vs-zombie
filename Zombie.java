@@ -71,6 +71,8 @@ public class Zombie extends AnimatedActor {
 
     @Override
     public void act() {
+        if (gameIsStopped()) return;
+        
         if (currentState == State.DEAD) {
             if (getReanimCurrentFrame() < 0) {
                 var world = getWorld();

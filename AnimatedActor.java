@@ -205,16 +205,24 @@ abstract public class AnimatedActor extends BaseActor {
     public void act() {
         updateFrame();
     }
+    
+    protected void setCanvas(GreenfootImage canvas) {
+        this.canvas = canvas;
+    }
 
     public void updateFrame() {
         if (this.reanimKey != null && this.reanimState != null) {
             float framesPassed = getFramesPassedAndUpdateTimer();
+            
+            var states = reanimExtraStates.stream();
+            if (reanimState.loop || reanimState.currentFrame >= 0.f) {
+                states = Stream.concat(Stream.of(reanimState), states);
+            }
 
-            Stream.concat(Stream.of(reanimState), reanimExtraStates.stream())
-                .forEach((state) -> {
-                    state.currentFrame = reanimManager.getNextFrame(reanimKey, state.name, state.currentFrame, framesPassed * state.speed, state.loop);
-                });
-                
+            states.forEach((state) -> {
+                state.currentFrame = reanimManager.getNextFrame(reanimKey, state.name, state.currentFrame, framesPassed * state.speed, state.loop);
+            });
+            
             reanimExtraStates.removeIf(state -> !state.loop && state.currentFrame < 0.f);
             
             var options = new ReanimRenderOptions() {

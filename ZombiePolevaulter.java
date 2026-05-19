@@ -64,15 +64,16 @@ public class ZombiePolevaulter extends Zombie {
                 case RUNNING_WITH_POLE -> {
                     animBaseName = "anim_run";
                     moveTimer.reset();
+                    setReanimState(animBaseName);
                 }
                 case JUMPING -> {
                     animBaseName = "anim_jump";
                     jumpStartX = getRealX();
                     jumpTimer.reset();
                     jumpTimer.start();
+                    setReanimState(animBaseName, false);
                 }
             }
-            setReanimState(animBaseName, false);
         }
     }
 

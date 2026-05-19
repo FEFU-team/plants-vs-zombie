@@ -4,8 +4,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.geom.*;
-import java.awt.image.BufferedImage;
+import java.awt.image.*;
 import java.awt.Graphics;
 import java.awt.AlphaComposite;
 import greenfoot.*;
@@ -50,14 +51,67 @@ public class ReanimManager {
                         String fileName = file.getName();
                         String baseName = fileName.substring(0, fileName.lastIndexOf('.'));
                         String key = keyPrefix + baseName.toUpperCase().replaceAll("[^A-Z0-9]", "_");
-
-                        images.put(key, new GreenfootImage(file.getAbsolutePath()));
+                        
+                        String absPath = file.getAbsolutePath();
+                        var image = new GreenfootImage(absPath);
+                        
+                        if (absPath.toLowerCase().endsWith(".jpg") || absPath.toLowerCase().endsWith(".jpeg")) {
+                            String maskPath = absPath.replaceAll("\\.(jpg|jpeg)$", "_.png");
+                            
+                            if (Files.exists(Path.of(maskPath))) {
+                                GreenfootImage mask = new GreenfootImage(maskPath);
+                                image = applyAlphaMask(image, mask);
+                            }
+                        }
+                        
+                        images.put(key, image);
                     } catch (Exception e) {
                         System.err.println("Error loading image file: " + file.getName() + " - " + e.getMessage());
                     }
                 }
             }
         }
+    }
+    
+    private static Image createAlphaMaskFromGrayscale(BufferedImage grayscaleImage) {
+        RGBImageFilter filter = new RGBImageFilter() {
+            @Override
+            public int filterRGB(int x, int y, int rgb) {
+                int color = rgb & 0xFF;
+                return (color << 24) | 0xFFFFFF;
+            }
+        };
+
+        FilteredImageSource filteredSource = new FilteredImageSource(grayscaleImage.getSource(), filter);
+        Image resultImage = Toolkit.getDefaultToolkit().createImage(filteredSource);
+
+        var alphaMask = new BufferedImage(
+            grayscaleImage.getWidth(), 
+            grayscaleImage.getHeight(), 
+            BufferedImage.TYPE_INT_ARGB
+        );
+        
+        alphaMask.getGraphics().drawImage(resultImage, 0, 0, null);
+        
+        return alphaMask;
+    }
+    
+    private static GreenfootImage applyAlphaMask(GreenfootImage image, GreenfootImage mask) {
+        int width = Math.min(image.getWidth(), mask.getWidth());
+        int height = Math.min(mask.getHeight(), mask.getHeight());
+        
+        var alphaMask = createAlphaMaskFromGrayscale(mask.getAwtImage());
+
+        var resultGreenfoot = new GreenfootImage(width, height);
+        BufferedImage result = resultGreenfoot.getAwtImage();
+        Graphics2D g = result.createGraphics();
+
+        g.drawImage(image.getAwtImage(), 0, 0, null);
+        g.setComposite(AlphaComposite.DstIn);
+        g.drawImage(alphaMask, 0, 0, null);
+        g.dispose();
+        
+        return resultGreenfoot;
     }
     
     GreenfootImage createCanvas() {

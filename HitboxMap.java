@@ -48,9 +48,13 @@ public class HitboxMap extends Actor {
             }
 
             for (var actor : world.getObjects(BaseActor.class)) {
-                var hitbox = actor.getHitbox();
-                img.setColor(Color.RED);
-                img.drawRect((int)hitbox.x, (int)hitbox.y, (int)hitbox.width, (int)hitbox.height);
+                try {
+                    var hitbox = actor.getHitbox();
+                    img.setColor(Color.RED);
+                    img.drawRect((int)hitbox.x, (int)hitbox.y, (int)hitbox.width, (int)hitbox.height);
+                } catch (UnsupportedOperationException error) {
+                    continue;
+                }
 
                 if (showAttackBoxes && actor instanceof Plant plant) {
                     var attackBox = plant.getAttackTargetBox();

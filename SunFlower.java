@@ -27,6 +27,8 @@ public class SunFlower extends Plant {
     
     @Override
     public void act() {
+        if (gameIsStopped()) return;
+        
         super.act();
         
         if (sunSpawnTimer.getDeltaSeconds() >= SUN_SPAWN_INTERVAL) {

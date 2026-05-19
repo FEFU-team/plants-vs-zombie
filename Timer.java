@@ -1,14 +1,14 @@
 public class Timer {
     private long lastUpdateTimeNanos;
     private long stopTimeNanos;
-    private float debugMultiplier = 1.f;
+    private static float debugMultiplier = 1.f;
 
     public Timer() {
         lastUpdateTimeNanos = System.nanoTime();
         stopTimeNanos = lastUpdateTimeNanos;
     }
     
-    public void debugSpeedUp(float multiplier) {
+    public static void debugSpeedUp(float multiplier) {
         debugMultiplier = multiplier;
     }
 

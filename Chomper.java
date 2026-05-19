@@ -48,6 +48,8 @@ public class Chomper extends Plant {
 
     @Override
     public void act() {
+        if (gameIsStopped()) return;
+        
         if (state == State.BITE && attackDelayTimer.getDeltaSeconds() >= ATTACK_DELAY) {
             attackDelayTimer.stop();
             attackDelayTimer.reset();

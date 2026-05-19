@@ -218,8 +218,8 @@ public class Level {
         for (var zombie : zombies) {
             if (zombie.isWon()) {
                 world.removeObject(zombie);
-                world.showText("The Zombies Ate Your Brain!", 500, 300);
-                Greenfoot.stop();
+                world.stopGame();
+                world.addObject(new ZombiesWon(reanimManager), ZombiesWon.POSITION_X, ZombiesWon.POSITION_Y);
                 
             }
         }

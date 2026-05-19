@@ -11,9 +11,10 @@ public class WallNut extends Plant {
     
     @Override
     public void act() {
+        if (gameIsStopped()) return;
+        
         super.act();
         
-        // TODO: update body image on damage
         // TODO: maybe stop animation while it's attacked like in original game
     }
     

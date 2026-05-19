@@ -47,6 +47,8 @@ public class PeaProjectile extends BaseActor {
 
     @Override
     public void act() {
+        if (gameIsStopped()) return;
+        
         setLocation(getRealX() + moveTimer.getDeltaSecondsAndReset() * SPEED, getRealY());
 
         var world = getWorld();

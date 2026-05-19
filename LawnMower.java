@@ -39,6 +39,8 @@ public class LawnMower extends AnimatedActor {
 
     @Override
     public void act() {
+        if (gameIsStopped()) return;
+        
         if (currentState == State.IDLE) {
             checkForZombies();
         } else if (currentState == State.TRIGGERED) {

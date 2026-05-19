@@ -39,6 +39,8 @@ public class PeaShooter extends Plant {
 
     @Override
     public void act() {
+        if (gameIsStopped()) return;
+        
         if (attackDelayActive && attackDelayTimer.getDeltaSeconds() > ATTACK_DELAY) {
             attackDelayActive = false;
             attackDelayTimer.stop();

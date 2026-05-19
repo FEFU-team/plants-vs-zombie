@@ -8,6 +8,7 @@ public class MyWorld extends World {
     private SunManager sunManager;
     private Level level;
     private boolean isPaused = true;
+    private boolean isStopped = false;
 
     public MyWorld() {
         super(1000, 600, 1);
@@ -15,6 +16,7 @@ public class MyWorld extends World {
         
         setPaintOrder(
             HitboxMap.class,
+            ZombiesWon.class,
             Sun.class,
             PeaProjectile.class,
             Zombie.class,
@@ -104,6 +106,36 @@ public class MyWorld extends World {
     void growPlant(Function<ReanimManager, ? extends Plant> create, int x, int y) {
         // TODO: move to Level
         //addObject(create.apply(reanimManager), CELL_GRID_START_X + (x + 1) * Cell.WIDTH, CELL_GRID_START_Y + y * Cell.HEIGHT);
+    }
+    
+    public boolean gameIsStopped() {
+        return isStopped;
+    }
+    
+    private Stream<BaseActor> stopGameActors() {
+        return Stream.of(
+            getObjects(LawnMower.class).stream(),
+            getObjects(Zombie.class).stream(),
+            getObjects(Plant.class).stream(),
+            getObjects(Sun.class).stream(),
+            getObjects(PeaProjectile.class).stream()
+        ).flatMap(s -> s);
+    }
+    
+    public void stopGame() {
+        isStopped = true;
+        
+        sunManager.lifecycleStop();
+        level.lifecycleStop();
+        stopGameActors().forEach(BaseActor::lifecycleStop);
+    }
+    
+    public void resumeGame() {
+        isStopped = false;
+        
+        sunManager.lifecycleStart();
+        level.lifecycleStart();
+        stopGameActors().forEach(BaseActor::lifecycleStart);
     }
 
     public SunManager getSunManager() {

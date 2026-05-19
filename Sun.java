@@ -62,6 +62,8 @@ public class Sun extends AnimatedActor {
 
     @Override
     public void act() {
+        if (gameIsStopped()) return;
+        
         super.act();
 
         if (falling) {

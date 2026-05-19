@@ -26,6 +26,8 @@ public class PotatoMine extends Plant {
 
     @Override
     public void act() {
+        if (gameIsStopped()) return;
+        
         super.act();
     }
 }
