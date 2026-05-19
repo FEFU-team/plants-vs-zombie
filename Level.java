@@ -47,10 +47,10 @@ public class Level {
     }
     
     public enum ZombieType {
-        /*Basic,
+        Basic,
         WithCone,
         Polevaulter,
-        Bucket,*/
+        Bucket,
         Paper
     }
     
@@ -139,10 +139,10 @@ public class Level {
     private void spawnSingleZombie(Wave wave) {
         ZombieType[] types = ZombieType.values();
         Zombie zombie = switch (types[random.nextInt(types.length)]) {
-           // case Basic -> new BasicZombie(reanimManager);
-           // case WithCone -> new ZombieWithCone(reanimManager);
-           // case Polevaulter -> new ZombiePolevaulter(reanimManager);
-            //case Bucket -> new ZombieWithBucket(reanimManager);
+            case Basic -> new BasicZombie(reanimManager);
+            case WithCone -> new ZombieWithCone(reanimManager);
+            case Polevaulter -> new ZombiePolevaulter(reanimManager);
+            case Bucket -> new ZombieWithBucket(reanimManager);
             case Paper -> new ZombieWithPaper(reanimManager);
             default -> null;
         };

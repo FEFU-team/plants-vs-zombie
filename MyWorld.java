@@ -40,6 +40,7 @@ public class MyWorld extends World {
         // TODO: wave timeline visualization
         // TODO: specify types and probabilities of zombies in wave
         
+        //некоторые растения для тестов
         //growPlant(SunFlower::new, 0, 0);
         growPlant(SunFlower::new, 1, 0);
         growPlant(SunFlower::new, 2, 0);
