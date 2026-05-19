@@ -1,6 +1,6 @@
 import greenfoot.*;
 import java.util.List;
-import java.awt.Rectangle;
+import java.awt.*;
 
 public class Zombie extends AnimatedActor {
     public enum State implements ZombieState { IDLE, WALKING, EATING, DEAD }
@@ -89,25 +89,10 @@ public class Zombie extends AnimatedActor {
     protected void handleStateLogic() {
         if (currentState == State.WALKING) {
             if (!winning()) {
-                moveZombie();
+                moveForward();
                 checkForPlants();
             } else  {
-                List<Door> doors = getWorld().getObjects(Door.class);
-                if (!doors.isEmpty()) {
-                    Door mainDoor = doors.get(0);
-                    int distanceY = YDifference(mainDoor);
-                    int distanceX = XDifference(mainDoor);
-                    if (distanceY > 50) {
-                        setLocation(getRealX(),getRealY() + getCellsPassedAndResetTimer() * CELL_WIDTH);
-                    }
-                    else if (distanceY < 50) {
-                        setLocation(getRealX(),getRealY() - getCellsPassedAndResetTimer() * CELL_WIDTH);
-                    }
-                    else if (distanceX > -15){
-                        setLocation(getRealX() - getCellsPassedAndResetTimer() * CELL_WIDTH, getRealY());
-                    }
-                    else gotBrain = true;
-                }
+                moveToDoor();
             }
         } else if (currentState == State.EATING) {
             attackPlant();
@@ -115,27 +100,41 @@ public class Zombie extends AnimatedActor {
             checkForPlants();
         }
     }
+    
+    protected void moveToDoor() {
+        var doorDistance = getDistanceFromDoor();
+        if (doorDistance != null) {
+            if (doorDistance.y > 50) {
+                setLocation(getRealX(), getRealY() + getCellsPassedAndResetTimer() * CELL_WIDTH);
+            } else if (doorDistance.y < 50) {
+                setLocation(getRealX(), getRealY() - getCellsPassedAndResetTimer() * CELL_WIDTH);
+            } else if (doorDistance.x <= 0){
+                setLocation(getRealX() - getCellsPassedAndResetTimer() * CELL_WIDTH, getRealY());
+            } else {
+                gotBrain = true;
+            }
+        }
+    }
 
-    protected void moveZombie() {
+    protected void moveForward() {
         setLocation(getRealX() - getCellsPassedAndResetTimer() * CELL_WIDTH, getRealY());
     }
     
-    public int YDifference(Door main) {
-        List<Door> doors = getWorld().getObjects(Door.class);
-        Door door = doors.get(0);
-        return door.getY() - this.getY();
+    public Point.Float getDistanceFromDoor(Door door) {
+        return new Point.Float(door.getX() - this.getX(), door.getY() - this.getY());
     }
     
-    public int XDifference(Door main) {
-        List<Door> doors = getWorld().getObjects(Door.class);
-        Door door = doors.get(0);
-        return door.getX() - this.getX();
+    public Point.Float getDistanceFromDoor() {
+        var door = getWorld().getObjects(Door.class).getFirst();
+        if (door == null) return null;
+        
+        return getDistanceFromDoor(door);
     }
     
     protected boolean winning() {
         java.util.List<Cell> cellList = getWorld().getObjects(Cell.class);
         for (Cell object : cellList) {
-            if ((this.getX()-object.getX() < -125) && object.getStatus() == true) {
+            if ((this.getX()-object.getX() < -55) && object.getStatus() == true) {
                 return true;
             }
         }

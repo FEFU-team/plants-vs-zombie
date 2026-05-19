@@ -3,47 +3,45 @@ import java.util.List;
 
 public class Door extends Actor {
     private enum DoorStyles {
-        BARREN("background1_gameover_interior_overlay.png"),
-        GARDEN_DAY("background1_gameover_interior_overlay.png"),
-        GARDEN_NIGHT("background2_gameover_interior_overlay.png"),
-        POOL_DAY("background3_gameover_interior_overlay.png"),
-        POOL_NIGHT("background4_gameover_interior_overlay.png"),
-        ROOF_DAY("background5_gameover_mask.png"),
-        ROOF_NIGHT("background6_gameover_mask.png");
-        
-        private String img;
-        
-        DoorStyles(String img) {
-            this.img = img;
+        BARREN("IMAGE_BACKGROUND1_GAMEOVER_INTERIOR_OVERLAY"),
+        GARDEN_DAY("IMAGE_BACKGROUND1_GAMEOVER_INTERIOR_OVERLAY"),
+        GARDEN_NIGHT("IMAGE_BACKGROUND2_GAMEOVER_INTERIOR_OVERLAY"),
+        POOL_DAY("IMAGE_BACKGROUND3_GAMEOVER_INTERIOR_OVERLAY"),
+        POOL_NIGHT("IMAGE_BACKGROUND4_GAMEOVER_INTERIOR_OVERLAY"),
+        ROOF_DAY("IMAGE_BACKGROUND5_GAMEOVER_MASK"),
+        ROOF_NIGHT("IMAGE_BACKGROUND6_GAMEOVER_MASK");
+
+        private String key;
+
+        DoorStyles(String key) {
+            this.key = key;
         }
-        
-        public String getimg() {
-            return img;
+
+        public String getKey() {
+            return key;
         }
     }
-    
-    public Door(String style) {
-        DoorStyles current = DoorStyles.valueOf(style);
-        
-        //String maskImage = current.getimg().replace("interior_overlay","mask");
-        GreenfootImage image = new GreenfootImage(current.getimg());
-        //GreenfootImage overlay = new GreenfootImage(current.getimg());
-        //image.drawImage(overlay,0,5);
-        
+
+    public Door(ReanimManager reanimManager, Level.Style style) {
+        DoorStyles current = DoorStyles.valueOf(style.name());
+
+        var image = reanimManager.getImage(current.getKey());
         image.setTransparency(0);
-        this.setImage(image);
+        setImage(image);
     }
-    
+
     void changeStatus() {
-        List<Zombie> zombies = getWorld().getObjects(Zombie.class);
-        for (Zombie z : zombies) {
-            if (z.YDifference(this) == 50) {
-                this.getImage().setTransparency(255);
+        var world = getWorld();
+        if (world == null) return;
+
+        for (Zombie zombie : world.getObjects(Zombie.class)) {
+            if (zombie.getDistanceFromDoor(this).y == 50) {
+                getImage().setTransparency(255);
                 return;
             }
         }
     }
-    
+
     public void act()
     {
         changeStatus();
