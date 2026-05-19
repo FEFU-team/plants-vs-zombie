@@ -197,7 +197,11 @@ public class Level {
         } else if (style == Style.ROOF_DAY || style == Style.ROOF_NIGHT) {
             // TODO: maybe add but i think it's too hard for our project
         } else {
-            world.addObject(new Door(reanimManager, style), 145, 335);
+            if (style == Style.GARDEN_NIGHT) {
+                world.addObject(new Door(reanimManager, style), 145, 335);
+            } else {
+                world.addObject(new Door(reanimManager, style), 130, 325);
+            }
             
             for (int j = 0; j < 5; j++) {
                 world.addObject(
