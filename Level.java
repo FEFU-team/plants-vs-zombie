@@ -50,7 +50,9 @@ public class Level {
     public enum ZombieType {
         Basic,
         WithCone,
-        Polevaulter
+        Polevaulter,
+        Bucket,
+        Paper
     }
     
     public static final int CELL_GRID_START_X = 260;
@@ -109,7 +111,7 @@ public class Level {
         
         checkGameStatus();
     }
-    
+
     private void tryToSpawnZombieWave() {
         if (currentWaveIdx >= waves.size() - 1) return;
         
@@ -147,6 +149,8 @@ public class Level {
             case Basic -> new BasicZombie(reanimManager);
             case WithCone -> new ZombieWithCone(reanimManager);
             case Polevaulter -> new ZombiePolevaulter(reanimManager);
+            case Bucket -> new ZombieWithBucket(reanimManager);
+            case Paper -> new ZombieWithPaper(reanimManager);
             default -> null;
         };
         

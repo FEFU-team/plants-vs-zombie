@@ -42,13 +42,18 @@ public class MyWorld extends World {
         // TODO: wave timeline visualization
         // TODO: specify types and probabilities of zombies in wave
         
-        /*growPlant(SunFlower::new, 0, 0);
-        growPlant(PeaShooter::new, 1, 0);
-        growPlant(WallNut::new, 5, 0);
-        growPlant(WallNut::new, 3, 2);
-        growPlant(SunFlower::new, 0, 3);
-        growPlant(PotatoMine::new, 5, 3);
-        growPlant(Chomper::new, 4, 3);*/
+        //некоторые растения для тестов
+        growPlant(SunFlower::new, 1, 0);
+        growPlant(SunFlower::new, 2, 0);
+        growPlant(SunFlower::new, 3, 0);
+        growPlant(PeaShooter::new, 1, 1);
+        growPlant(PeaShooter::new, 2, 1);
+        growPlant(SunFlower::new, 3, 1);
+        growPlant(PeaShooter::new, 2, 2);
+        growPlant(SunFlower::new, 3, 2);
+        growPlant(SunFlower::new, 3, 3);
+        growPlant(SunFlower::new, 3, 4);
+        growPlant(Chomper::new, 4, 3);
 
         sunManager = new SunManager(this, reanimManager);
 
@@ -102,10 +107,10 @@ public class MyWorld extends World {
             actor.lifecycleStart();
         }
     }
-    
+
     void growPlant(Function<ReanimManager, ? extends Plant> create, int x, int y) {
         // TODO: move to Level
-        //addObject(create.apply(reanimManager), CELL_GRID_START_X + (x + 1) * Cell.WIDTH, CELL_GRID_START_Y + y * Cell.HEIGHT);
+        addObject(create.apply(reanimManager), (float)Level.CELL_GRID_START_X + x * Cell.WIDTH, (float)Level.CELL_GRID_START_Y + y * Cell.HEIGHT);
     }
     
     public boolean gameIsStopped() {
