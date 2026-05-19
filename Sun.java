@@ -3,10 +3,11 @@ import java.awt.Rectangle;
 
 public class Sun extends AnimatedActor {
     private static final int SUN_VALUE = 25;
-    private static final float FALL_SPEED = 1.f;
-    private static final int DISAPPEAR_TIME = 300;
+    private static final float FALL_SPEED = 70.f;
+    private static final int DISAPPEAR_TIME = 7;
 
-    private int lifeTimer = 0;
+    private Timer lifeTimer = new Timer();
+    private Timer fallTimer = new Timer();
     private float targetY;
     private boolean falling = true;
     
@@ -40,6 +41,20 @@ public class Sun extends AnimatedActor {
 
         this.targetY = targetY;
     }
+
+    @Override
+    public void lifecycleStop() {
+        super.lifecycleStop();
+        lifeTimer.stop();
+        fallTimer.stop();
+    }
+
+    @Override
+    public void lifecycleStart() {
+        super.lifecycleStart();
+        lifeTimer.start();
+        fallTimer.start();
+    }
     
     public void setTargetY(int targetY) {
         this.targetY = targetY;
@@ -51,18 +66,15 @@ public class Sun extends AnimatedActor {
 
         if (falling) {
             fall();
-        } else {
-            lifeTimer++;
-            if (lifeTimer >= DISAPPEAR_TIME) {
-                disappear();
-            }
+        } else if (lifeTimer.getDeltaSeconds() >= DISAPPEAR_TIME) {
+            disappear();
         }
 
         checkClick();
     }
 
     private void fall() {
-        float realY = getRealY() + FALL_SPEED;
+        float realY = getRealY() + fallTimer.getDeltaSecondsAndReset() * FALL_SPEED;
 
         if (realY >= targetY) {
             realY = targetY;

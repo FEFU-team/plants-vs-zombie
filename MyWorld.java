@@ -31,7 +31,7 @@ public class MyWorld extends World {
             reanimManager,
             new Level.WavesBuilder()
                 .addWave(6, 5.f)
-                .addWave(10, 30.f)
+                .addWave(10, 40.f)
                 .build()
         );
         level.setStyle(Level.Style.GARDEN_NIGHT);
@@ -48,21 +48,6 @@ public class MyWorld extends World {
         growPlant(PotatoMine::new, 5, 3);
         growPlant(Chomper::new, 4, 3);*/
 
-        /*{
-            // TODO: maybe add pauses in move cycle like in original
-            var zombie = new ZombieWithCone(reanimManager);
-            addObject(zombie, CELL_GRID_START_X + 9 * Cell.WIDTH, CELL_GRID_START_Y + (int)(0.1 * Cell.HEIGHT) - (int)Zombie.TOP_HEIGHT);
-        }
-        {
-            var zombie = new BasicZombie(reanimManager);
-            addObject(zombie, CELL_GRID_START_X + 9 * Cell.WIDTH, CELL_GRID_START_Y + (int)(3.1 * Cell.HEIGHT) - (int)Zombie.TOP_HEIGHT);
-        }
-        {
-            var zombie = new ZombiePolevaulter(reanimManager);
-            addObject(zombie, CELL_GRID_START_X + 6 * Cell.WIDTH, CELL_GRID_START_Y + (int)(2.1 * Cell.HEIGHT) - (int)Zombie.TOP_HEIGHT);
-        }*/
-
-        // Инициализация системы солнышек
         sunManager = new SunManager(this, reanimManager);
 
         // Debug: draw hitboxes
@@ -79,6 +64,7 @@ public class MyWorld extends World {
             actor.lifecycleStop();
         }
         
+        sunManager.lifecycleStop();
         level.lifecycleStop();
     }
 
@@ -89,6 +75,7 @@ public class MyWorld extends World {
             actor.lifecycleStart();
         }
         
+        sunManager.lifecycleStart();
         level.lifecycleStart();
     }
 
