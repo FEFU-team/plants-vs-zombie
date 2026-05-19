@@ -1,4 +1,6 @@
+import greenfoot.*;
 import java.util.*;
+import java.awt.Rectangle;
 
 public class Level {
     public static class Wave {
@@ -51,8 +53,8 @@ public class Level {
         Polevaulter
     }
     
-    private static final int CELL_GRID_START_X = 170;
-    private static final int CELL_GRID_START_Y = 80;
+    public static final int CELL_GRID_START_X = 260;
+    public static final int CELL_GRID_START_Y = 80;
     
     private static final int WAVE_APPROACH_MESSAGE_INTERVAL = 5;
     private static final int WAVE_MESSAGE_HIDE_INTERVAL = 5;
@@ -100,6 +102,12 @@ public class Level {
     public void act() {
         tryToSpawnZombieWave();
         trySpawnNextZombie();
+        
+        if (currentWaveIdx >= waves.size() - 1 && levelTimer.getDeltaSeconds() > waves.get(currentWaveIdx).startsAt + WAVE_MESSAGE_HIDE_INTERVAL) {
+            world.showText("", 500, 200);
+        }
+        
+        checkGameStatus();
     }
     
     private void tryToSpawnZombieWave() {
@@ -132,7 +140,7 @@ public class Level {
             nextZombieSpawnTime += ZOMBIE_SPAWN_DELAY;
         }
     }
-        
+
     private void spawnSingleZombie(Wave wave) {
         ZombieType[] types = ZombieType.values();
         Zombie zombie = switch (types[random.nextInt(types.length)]) {
@@ -147,7 +155,7 @@ public class Level {
             world.addObject(
                 zombie,
                 CELL_GRID_START_X + Cell.WIDTH * 11,
-                CELL_GRID_START_Y + (int)((0.1f + rowIndex) * Cell.HEIGHT) - (int)Zombie.TOP_HEIGHT
+                CELL_GRID_START_Y + ((0.1f + rowIndex) * Cell.HEIGHT) - Zombie.TOP_HEIGHT
             );
             
             orderZombieZLayer();
@@ -163,17 +171,16 @@ public class Level {
             }))
             .toList();
         
-        Map<Zombie, int[]> positions = new HashMap<>();
+        Map<Zombie, float[]> positions = new HashMap<>();
         for (var a : zombies) {
-            positions.put(a, new int[] { a.getX(), a.getY() });
+            positions.put(a, new float[] { a.getRealX(), a.getRealY() });
         }
-
-        
+    
         for (var zombie : zombies) {
             world.removeObject(zombie);
         }
         for (var zombie : zombies) {
-            int[] pos = positions.get(zombie);
+            var pos = positions.get(zombie);
             world.addObject(zombie, pos[0], pos[1]);
         }
     }
@@ -186,24 +193,39 @@ public class Level {
         } else if (style == Style.ROOF_DAY || style == Style.ROOF_NIGHT) {
             // TODO: maybe add but i think it's too hard for our project
         } else {
-            final var cellGridX = CELL_GRID_START_X + Cell.WIDTH / 2;
-            final var cellGridY = CELL_GRID_START_Y + Cell.HEIGHT / 2;
-            
             world.addObject(new Door(reanimManager, style), 145, 335);
             
-            for (int i = 0; i < 10; i++) {
-                for (int j = 0; j < 5; j++) {
-                    if (i == 0) {
-                        var lawnMower = new LawnMower(reanimManager);
-                        world.addObject(
-                            lawnMower,
-                            CELL_GRID_START_X + (int)(Cell.WIDTH * 0.1f),
-                            CELL_GRID_START_Y + (int)((j + 0.3f) * Cell.HEIGHT)
-                        );
-                    }
-                    world.addObject(new Cell(i == 0), cellGridX + i * Cell.WIDTH, cellGridY + j * Cell.HEIGHT);
-                }
+            for (int j = 0; j < 5; j++) {
+                world.addObject(
+                    new LawnMower(reanimManager),
+                    CELL_GRID_START_X - (Cell.WIDTH * 0.9f),
+                    CELL_GRID_START_Y + ((j + 0.3f) * Cell.HEIGHT)
+                );
             }
         }
+    }
+    
+    public void checkGameStatus() {
+        var zombies = world.getObjects(Zombie.class);
+        if (zombies.isEmpty()) {
+            var lastWave = waves.getLast();
+            if (lastWave.zombiesSpawned == lastWave.totalZombies) {
+                world.showText("Victory!", 500, 300);
+                Greenfoot.stop();
+            }
+        }
+        
+        for (var zombie : zombies) {
+            if (zombie.isWon()) {
+                world.removeObject(zombie);
+                world.showText("The Zombies Ate Your Brain!", 500, 300);
+                Greenfoot.stop();
+                
+            }
+        }
+    }
+
+    public Rectangle.Float getWinHitbox() {
+        return new Rectangle.Float(0, 0, CELL_GRID_START_X - Cell.WIDTH, world.getHeight());
     }
 }

@@ -45,7 +45,7 @@ public class Plant extends AnimatedActor {
         if (attackHitbox == null) return null;
 
         for (Zombie zombie : world.getObjects(Zombie.class)) {
-            if (zombie.isAlive() && attackHitbox.intersects(zombie.getHitbox())) {
+            if (!zombie.isUntouchable() && attackHitbox.intersects(zombie.getHitbox())) {
                 return zombie;
             }
         }

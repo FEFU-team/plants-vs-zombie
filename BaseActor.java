@@ -1,7 +1,7 @@
 import greenfoot.*;
 import java.awt.Rectangle;
 
-public class BaseActor extends Actor {
+public abstract class BaseActor extends Actor {
     private float realX;
     private float realY;
     

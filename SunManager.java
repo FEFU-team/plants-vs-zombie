@@ -41,7 +41,7 @@ public class SunManager {
         int randomTargetY = 100 + random.nextInt(GROUND_Y - 100);
 
         Sun sun = new Sun(reanimManager, randomTargetY);
-        world.addObject(sun, randomX, START_Y);
+        world.addObject(sun, (float)randomX, (float)START_Y);
     }
 
     public void addSun(int amount) {

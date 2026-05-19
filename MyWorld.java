@@ -30,8 +30,8 @@ public class MyWorld extends World {
             this,
             reanimManager,
             new Level.WavesBuilder()
-                .addWave(6, 10.f)
-                .addWave(10, 180.f)
+                .addWave(6, 5.f)
+                .addWave(10, 30.f)
                 .build()
         );
         level.setStyle(Level.Style.GARDEN_NIGHT);
@@ -68,6 +68,7 @@ public class MyWorld extends World {
         // Debug: draw hitboxes
         var hitboxMap = new HitboxMap();
         hitboxMap.toggleAttackBoxes(true);
+        hitboxMap.toggleCellBoxes(true);
         addObject(hitboxMap, getWidth() / 2, getHeight() / 2);
     }
 
@@ -95,25 +96,6 @@ public class MyWorld extends World {
     public void act() {
         sunManager.act();
         level.act();
-        checkGameStatus();
-    }
-    
-    void checkGameStatus() {
-        // TODO: move to Level and rewrite
-        /*var zombies = this.getObjects(Zombie.class);
-        if (zombies.isEmpty() && currentWave == waves) {
-            showText("Victory!", 500, 300);
-            Greenfoot.stop();
-        }
-        
-        for (Zombie zombie : zombies) {
-            if (zombie.isZombieWon()) {
-                this.removeObject(zombie);
-                showText("The Zombies Ate Your Brain!", 500, 300);
-                Greenfoot.stop();
-                
-            }
-        }*/
     }
 
     @Override
@@ -121,6 +103,14 @@ public class MyWorld extends World {
         super.addObject(actor, x, y);
         if (!isPaused && actor instanceof BaseActor actorWithLifecycle) {
             actorWithLifecycle.lifecycleStart();
+        }
+    }
+
+    public void addObject(BaseActor actor, float x, float y) {
+        super.addObject(actor, (int)x, (int)y);
+        actor.setLocation(x, y);
+        if (!isPaused) {
+            actor.lifecycleStart();
         }
     }
     
@@ -131,5 +121,9 @@ public class MyWorld extends World {
 
     public SunManager getSunManager() {
         return sunManager;
+    }
+
+    public Level getLevel() {
+        return level;
     }
 }

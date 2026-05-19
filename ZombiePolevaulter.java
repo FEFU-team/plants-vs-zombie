@@ -7,7 +7,7 @@ public class ZombiePolevaulter extends Zombie {
         JUMPING
     }
 
-    private static final float JUMP_DISTANCE = CELL_WIDTH * 1.65f;
+    private static final float JUMP_DISTANCE = Cell.WIDTH * 1.65f;
     private static final float JUMP_DURATION = 2.3f;
 
     private Timer jumpTimer = new Timer();
@@ -40,7 +40,7 @@ public class ZombiePolevaulter extends Zombie {
     @Override
     protected void handleStateLogic() {
         if (currentState == PolevaulterState.RUNNING_WITH_POLE) {
-            if (!winning()) {
+            if (!isWinning()) {
                 moveForward();
                 checkForPlantsToJump();
             } else {
@@ -101,5 +101,9 @@ public class ZombiePolevaulter extends Zombie {
             jumpTimer.stop();
             setState(Zombie.State.WALKING);
         }
+    }
+    
+    public boolean isUntouchable() {
+        return super.isUntouchable() || currentState == PolevaulterState.JUMPING;
     }
 }

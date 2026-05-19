@@ -35,7 +35,7 @@ public class Door extends Actor {
         if (world == null) return;
 
         for (Zombie zombie : world.getObjects(Zombie.class)) {
-            if (zombie.getDistanceFromDoor(this).y == 50) {
+            if (Math.abs(zombie.getDistanceFromDoor(this).x) < 20) {
                 getImage().setTransparency(255);
                 return;
             }

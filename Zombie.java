@@ -8,8 +8,6 @@ public class Zombie extends AnimatedActor {
     public static final float LEFT_INDENT = 10;
     public static final float TOP_HEIGHT = 50;
 
-    protected static final float CELL_WIDTH = 90; // TODO: adjust and move to more suitable place
-
     protected ZombieState currentState = State.IDLE;
     protected float maxHp;
     protected float currentHp;
@@ -88,7 +86,7 @@ public class Zombie extends AnimatedActor {
 
     protected void handleStateLogic() {
         if (currentState == State.WALKING) {
-            if (!winning()) {
+            if (!isWinning()) {
                 moveForward();
                 checkForPlants();
             } else  {
@@ -104,12 +102,12 @@ public class Zombie extends AnimatedActor {
     protected void moveToDoor() {
         var doorDistance = getDistanceFromDoor();
         if (doorDistance != null) {
-            if (doorDistance.y > 50) {
-                setLocation(getRealX(), getRealY() + getCellsPassedAndResetTimer() * CELL_WIDTH);
-            } else if (doorDistance.y < 50) {
-                setLocation(getRealX(), getRealY() - getCellsPassedAndResetTimer() * CELL_WIDTH);
-            } else if (doorDistance.x <= 0){
-                setLocation(getRealX() - getCellsPassedAndResetTimer() * CELL_WIDTH, getRealY());
+            if (doorDistance.y > 60) {
+                setLocation(getRealX(), getRealY() + getCellsPassedAndResetTimer() * Cell.WIDTH);
+            } else if (doorDistance.y < 40) {
+                setLocation(getRealX(), getRealY() - getCellsPassedAndResetTimer() * Cell.WIDTH);
+            } else if (doorDistance.x < 10){
+                setLocation(getRealX() - getCellsPassedAndResetTimer() * Cell.WIDTH, getRealY());
             } else {
                 gotBrain = true;
             }
@@ -117,11 +115,11 @@ public class Zombie extends AnimatedActor {
     }
 
     protected void moveForward() {
-        setLocation(getRealX() - getCellsPassedAndResetTimer() * CELL_WIDTH, getRealY());
+        setLocation(getRealX() - getCellsPassedAndResetTimer() * Cell.WIDTH, getRealY());
     }
     
     public Point.Float getDistanceFromDoor(Door door) {
-        return new Point.Float(door.getX() - this.getX(), door.getY() - this.getY());
+        return new Point.Float(door.getX() - getRealX(), door.getY() - getRealY());
     }
     
     public Point.Float getDistanceFromDoor() {
@@ -131,14 +129,11 @@ public class Zombie extends AnimatedActor {
         return getDistanceFromDoor(door);
     }
     
-    protected boolean winning() {
-        java.util.List<Cell> cellList = getWorld().getObjects(Cell.class);
-        for (Cell object : cellList) {
-            if ((this.getX()-object.getX() < -55) && object.getStatus() == true) {
-                return true;
-            }
-        }
-        return false;
+    protected boolean isWinning() {
+        var world = getWorldOfType(MyWorld.class);
+        if (world == null) return false;
+
+        return world.getLevel().getWinHitbox().intersects(getHitbox());
     }
 
     protected void checkForPlants() {
@@ -190,10 +185,9 @@ public class Zombie extends AnimatedActor {
         }
     }
     
-    public boolean isZombieWon() {
+    public boolean isWon() {
         return gotBrain;
     }
-
     
     public void instantKill() {
         currentHp = 0;
@@ -231,11 +225,15 @@ public class Zombie extends AnimatedActor {
         this.lostArm = true;
     }
 
-    float getCellsPassedAndResetTimer() {
+    protected float getCellsPassedAndResetTimer() {
         return moveTimer.getDeltaSecondsAndReset() * moveSpeed;
     }
 
-    boolean isAlive() {
+    public boolean isAlive() {
         return currentState != State.DEAD;
+    }
+    
+    public boolean isUntouchable() {
+        return !isAlive() || isWinning();
     }
 }

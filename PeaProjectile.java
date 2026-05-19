@@ -58,7 +58,7 @@ public class PeaProjectile extends BaseActor {
             var hitbox = getHitbox();
 
             for (Zombie zombie : world.getObjects(Zombie.class)) {
-                if (zombie.isAlive() && hitbox.intersects(zombie.getHitbox())) {
+                if (!zombie.isUntouchable() && hitbox.intersects(zombie.getHitbox())) {
                     zombie.takeDamage(DAMAGE);
                     world.removeObject(this);
                     return;
