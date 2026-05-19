@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.function.Function;
 
 public class Level {
     public static class Wave {
@@ -46,9 +47,11 @@ public class Level {
     }
     
     public enum ZombieType {
-        Basic,
+        /*Basic,
         WithCone,
-        Polevaulter
+        Polevaulter,
+        Bucket,*/
+        Paper
     }
     
     private static final int CELL_GRID_START_X = 170;
@@ -101,7 +104,7 @@ public class Level {
         tryToSpawnZombieWave();
         trySpawnNextZombie();
     }
-    
+
     private void tryToSpawnZombieWave() {
         if (currentWaveIdx >= waves.size() - 1) return;
         
@@ -136,9 +139,11 @@ public class Level {
     private void spawnSingleZombie(Wave wave) {
         ZombieType[] types = ZombieType.values();
         Zombie zombie = switch (types[random.nextInt(types.length)]) {
-            case Basic -> new BasicZombie(reanimManager);
-            case WithCone -> new ZombieWithCone(reanimManager);
-            case Polevaulter -> new ZombiePolevaulter(reanimManager);
+           // case Basic -> new BasicZombie(reanimManager);
+           // case WithCone -> new ZombieWithCone(reanimManager);
+           // case Polevaulter -> new ZombiePolevaulter(reanimManager);
+            //case Bucket -> new ZombieWithBucket(reanimManager);
+            case Paper -> new ZombieWithPaper(reanimManager);
             default -> null;
         };
         

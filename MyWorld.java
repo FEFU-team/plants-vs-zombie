@@ -30,8 +30,8 @@ public class MyWorld extends World {
             this,
             reanimManager,
             new Level.WavesBuilder()
-                .addWave(6, 10.f)
-                .addWave(10, 180.f)
+                .addWave(10, 10.f)
+                .addWave(6, 180.f)
                 .build()
         );
         level.setStyle(Level.Style.GARDEN_NIGHT);
@@ -40,13 +40,27 @@ public class MyWorld extends World {
         // TODO: wave timeline visualization
         // TODO: specify types and probabilities of zombies in wave
         
-        /*growPlant(SunFlower::new, 0, 0);
-        growPlant(PeaShooter::new, 1, 0);
-        growPlant(WallNut::new, 5, 0);
-        growPlant(WallNut::new, 3, 2);
-        growPlant(SunFlower::new, 0, 3);
-        growPlant(PotatoMine::new, 5, 3);
-        growPlant(Chomper::new, 4, 3);*/
+        //growPlant(SunFlower::new, 0, 0);
+        growPlant(SunFlower::new, 1, 0);
+        growPlant(SunFlower::new, 2, 0);
+        growPlant(SunFlower::new, 3, 0);
+        growPlant(PeaShooter::new, 1, 1);
+        growPlant(PeaShooter::new, 2, 1);
+        growPlant(SunFlower::new, 3, 1);
+        growPlant(PeaShooter::new, 2, 2);
+        growPlant(SunFlower::new, 3, 2);
+      //  growPlant(PeaShooter::new, 1, 2);
+      //  growPlant(PeaShooter::new, 2, 3);
+        growPlant(SunFlower::new, 3, 3);
+      //  growPlant(PeaShooter::new, 1, 3);
+        //growPlant(PeaShooter::new, 2, 4);
+        growPlant(SunFlower::new, 3, 4);
+        //growPlant(PeaShooter::new, 1, 4);
+        //growPlant(WallNut::new, 5, 0);
+        //growPlant(WallNut::new, 3, 2);
+        //growPlant(SunFlower::new, 0, 3);
+       // growPlant(PotatoMine::new, 5, 3);
+        growPlant(Chomper::new, 4, 3);
 
         /*{
             // TODO: maybe add pauses in move cycle like in original
@@ -115,7 +129,10 @@ public class MyWorld extends World {
             }
         }*/
     }
-
+        public void growPlant(Function<ReanimManager, ? extends Plant> create, int x, int y) {
+        // TODO: move to Level
+        addObject(create.apply(reanimManager), 170 + (x + 1) * Cell.WIDTH, 80 + y * Cell.HEIGHT);
+    }
     @Override
     public void addObject(Actor actor, int x, int y) {
         super.addObject(actor, x, y);
@@ -124,10 +141,7 @@ public class MyWorld extends World {
         }
     }
     
-    void growPlant(Function<ReanimManager, ? extends Plant> create, int x, int y) {
-        // TODO: move to Level
-        //addObject(create.apply(reanimManager), CELL_GRID_START_X + (x + 1) * Cell.WIDTH, CELL_GRID_START_Y + y * Cell.HEIGHT);
-    }
+
 
     public SunManager getSunManager() {
         return sunManager;
