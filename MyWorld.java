@@ -10,6 +10,8 @@ public class MyWorld extends World {
     private Level level;
     private boolean isPaused = true;
     private boolean isStopped = false;
+    private java.awt.Rectangle[][] cellGrid = new java.awt.Rectangle[9][5];
+    private SeedBank.Seed selectedSeed = null;
 
     public MyWorld() {
         super(1000, 600, 1);
@@ -28,7 +30,6 @@ public class MyWorld extends World {
         reanimManager.loadImages("./images", "IMAGE_");
         reanimManager.loadImages("./images/reanim", "IMAGE_REANIM_");
 
-        // Для тестов конкретный уровень и сложность
         level = new Level(
             this,
             reanimManager,
@@ -65,12 +66,19 @@ public class MyWorld extends World {
         seeds.add(SeedBank.SeedType.PotatoMine);
         seeds.add(SeedBank.SeedType.Chomper);
         seedBank = new SeedBank(this, sunManager, reanimManager, seeds);
-
         // Debug: draw hitboxes
         var hitboxMap = new HitboxMap();
         hitboxMap.toggleAttackBoxes(true);
         hitboxMap.toggleCellBoxes(true);
         addObject(hitboxMap, getWidth() / 2, getHeight() / 2);
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < 5; ++j) {
+                int cellLeftX = Level.CELL_GRID_START_X + i * Cell.WIDTH;
+                int cellTopY = Level.CELL_GRID_START_Y + j * Cell.HEIGHT;
+                
+                cellGrid[i][j] = new java.awt.Rectangle(cellLeftX, cellTopY, Cell.WIDTH, Cell.HEIGHT);
+            }
+        }
     }
 
     @Override
@@ -103,6 +111,10 @@ public class MyWorld extends World {
         seedBank.act();
         level.act();
     }
+    public void setSelectedSeed(SeedBank.Seed seed) {
+        this.selectedSeed = seed;
+    }
+
 
     @Override
     public void addObject(Actor actor, int x, int y) {
@@ -121,7 +133,6 @@ public class MyWorld extends World {
     }
 
     void growPlant(Function<ReanimManager, ? extends Plant> create, int x, int y) {
-        // TODO: move to Level
         addObject(create.apply(reanimManager), (float)Level.CELL_GRID_START_X + x * Cell.WIDTH, (float)Level.CELL_GRID_START_Y + y * Cell.HEIGHT);
     }
     

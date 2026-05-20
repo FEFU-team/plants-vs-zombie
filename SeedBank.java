@@ -4,37 +4,48 @@ import java.util.function.Function;
 import java.awt.Image;
 import java.awt.AlphaComposite;
 import java.awt.image.BufferedImage;
-
+import java.awt.Rectangle;
 public class SeedBank {
     public static enum SeedType {
-        SunFlower(SunFlower::new, "REANIM_SUNFLOWER", "anim_idle", 7.5f, true),
-        PeaShooter(PeaShooter::new, "REANIM_PEASHOOTERSINGLE", "anim_full_idle", 7.5f, true),
-        WallNut(WallNut::new, "REANIM_WALLNUT", "anim_idle", 30.f, false),
-        PotatoMine(PotatoMine::new, "REANIM_POTATOMINE", "anim_armed", 30.f, false),
-        Chomper(Chomper::new, "REANIM_CHOMPER", "anim_idle", 7.5f, false);
+        SunFlower(SunFlower::new, "REANIM_SUNFLOWER", "anim_idle", 7.5f, true, 50),
+        PeaShooter(PeaShooter::new, "REANIM_PEASHOOTERSINGLE", "anim_full_idle", 7.5f, true, 100),
+        WallNut(WallNut::new, "REANIM_WALLNUT", "anim_idle", 30.f, false, 50),
+        PotatoMine(PotatoMine::new, "REANIM_POTATOMINE", "anim_armed", 30.f, false, 25),
+        Chomper(Chomper::new, "REANIM_CHOMPER", "anim_idle", 7.5f, false, 150);
         
         private Function<ReanimManager, ? extends Plant> creator;
         private String reanimKey;
         private String reanimState;
         private float reloadInterval;
         private boolean defaultReady;
+        private int sunCost;
         
         SeedType(
             Function<ReanimManager, ? extends Plant> creator,
             String reanimKey,
             String reanimState,
             float reloadInterval,
-            boolean defaultReady
+            boolean defaultReady,
+            int sunCost
         ) {
             this.creator = creator;
             this.reanimKey = reanimKey;
             this.reanimState = reanimState;
             this.reloadInterval = reloadInterval;
             this.defaultReady = defaultReady;
+            this.sunCost = sunCost;
+        }
+
+        public int getSunCost() {
+            return sunCost;
+        }
+
+        public Function<ReanimManager, ? extends Plant> getCreator() {
+            return creator;
         }
     }
     
-    private class Seed {
+    public class Seed {
         private static int WIDTH = 50;
         private static int INDENT = 8;
         
@@ -43,10 +54,9 @@ public class SeedBank {
         
         Seed(SeedType type) {
             this.type = type;
-            
-            if (type.defaultReady) {
+           /* if (type.defaultReady) {
                 reloadTimer.add(type.reloadInterval);
-            }
+            }*/
         }
         
         private GreenfootImage getImage() {
@@ -74,7 +84,7 @@ public class SeedBank {
             
             var plantImage = reanimManager.renderSprite(type.reanimKey, options);
             if (plantImage != null) {
-                final float scale = 0.55f; // TODO: specify scale separately for each seed type
+                final float scale = 0.55f;
                 
                 var scaled = plantImage
                     .getAwtImage()
@@ -90,17 +100,29 @@ public class SeedBank {
                 g2d.drawImage(scaled, 3 - scaled.getWidth(null) / 2, 4 - scaled.getHeight(null) / 2, null);
                 
                 float progress = Math.clamp(reloadTimer.getDeltaSeconds() / type.reloadInterval, 0.f, 1.f);
-                
+                boolean hasEnoughSun = sunManager.getSunCount() >= type.sunCost;
+
                 if (progress < 1.f) {
                     int lightHeight = (int)(progress * awtImage.getHeight());
-                    darkenAreaInplace(awtImage, 0, 0, awtImage.getWidth(), awtImage.getHeight() - lightHeight, 0.4f);
-                    // TODO: left part also should be tinted slightly lighter while progress < 1.f
-                    // TODO: tint if not enough suns
+                    darkenAreaInplace(awtImage, 0, 0, awtImage.getWidth(), awtImage.getHeight() - lightHeight, 0.6f);
+                    darkenAreaInplace(awtImage, 0, 0, awtImage.getWidth(), awtImage.getHeight(), 0.4f);
+                }
+               else if (!hasEnoughSun) {
+                    darkenAreaInplace(awtImage, 0, 0, awtImage.getWidth(), awtImage.getHeight(), 0.4f);
                 }
             } else {
                 System.out.println("Cannot render plant image in SunBank");
             }
             
+            image.setColor(Color.BLACK);
+            image.setFont(new Font(14));
+            String costText = String.valueOf(type.sunCost);
+            if(costText.length()==2){
+            image.drawString(costText, WIDTH - (image.getFont().getSize() * costText.length()) -8, image.getHeight() - 4);
+        }
+        else{
+            image.drawString(costText, WIDTH - (image.getFont().getSize() * 2) -16, image.getHeight() - 4);
+        }
             return image;
         }
         
@@ -118,6 +140,18 @@ public class SeedBank {
             } finally {
                 g2d.dispose();
             }
+        }
+
+        public boolean isReady() {
+            return reloadTimer.getDeltaSeconds() >= type.reloadInterval && sunManager.getSunCount() >= type.sunCost;
+        }
+
+        public void resetReload() {
+            reloadTimer.reset();
+        }
+
+        public SeedType getType() {
+            return type;
         }
     }
     
@@ -138,9 +172,8 @@ public class SeedBank {
         
         this.seeds = seeds.stream().map(type -> new Seed(type)).toList();
         
-        updateBankDisplay();
         bankDisplay = new Actor() {};
-        bankDisplay.setImage(bankImage);
+        updateBankDisplay();
         world.addObject(bankDisplay, bankImage.getWidth() / 2, bankImage.getHeight() / 2);
     }
 
@@ -188,5 +221,27 @@ public class SeedBank {
                 (bankImage.getHeight() - seedImage.getHeight()) / 2
             );
         }
+        bankDisplay.setImage(bankImage);
+    }
+
+    public Seed getSeedAt(int x, int y) {
+        if (y < 0 || y > bankImage.getHeight()) return null;
+        if (x < SUN_BANK_WIDTH + Seed.INDENT) return null;
+
+        int index = (x - SUN_BANK_WIDTH - Seed.INDENT) / (Seed.WIDTH + Seed.INDENT);
+        if (index >= 0 && index < seeds.size()) {
+            int startX = SUN_BANK_WIDTH + Seed.INDENT + index * (Seed.WIDTH + Seed.INDENT);
+            if (x >= startX && x <= startX + Seed.WIDTH) {
+                return seeds.get(index);
+            }
+        }
+        return null;
+    }
+
+    public Actor getBankDisplay() {
+        return bankDisplay;
+    }
+    public List<Seed> getSeeds() {
+        return seeds;
     }
 }
