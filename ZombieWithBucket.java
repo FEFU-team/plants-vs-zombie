@@ -1,9 +1,8 @@
 import greenfoot.*;  
 
 
-public class ZombieWithBucket extends BasicZombie
-{
-protected static final float BUCKET_HEALTH_BUFF = 1100;
+public class ZombieWithBucket extends BasicZombie {
+    protected static final float BUCKET_HEALTH_BUFF = 1100;
     
     public ZombieWithBucket(ReanimManager manager) {
         super(manager, BASIC_MAX_HEALTH + BUCKET_HEALTH_BUFF);

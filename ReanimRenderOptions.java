@@ -4,11 +4,19 @@ import greenfoot.*;
 public interface ReanimRenderOptions {
     ReanimExtraState getMainState();
     
-    Collection<? extends ReanimExtraState> getExtraStates();
+    default Collection<? extends ReanimExtraState> getExtraStates() {
+        return null;
+    }
     
-    Collection<String> getHiddenLayers();
+    default Collection<String> getHiddenLayers() {
+        return null;
+    }
     
-    Map<String, String> getImageSwaps();
+    default Map<String, String> getImageSwaps() {
+        return null;
+    }
     
-    GreenfootImage getCanvas();
+    default GreenfootImage getCanvas() {
+        return null;
+    }
 }

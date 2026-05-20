@@ -168,7 +168,10 @@ public class ReanimManager {
                     return false;
                 }
                 
-                this.gfImg = images.get(imageSwaps.getOrDefault(f1.image, f1.image));
+                var imageKey = imageSwaps != null
+                    ? imageSwaps.getOrDefault(f1.image, f1.image)
+                    : f1.image;
+                this.gfImg = images.get(imageKey);
                 if (gfImg == null) return false;
                 
                 var f2 = f1;
@@ -228,7 +231,7 @@ public class ReanimManager {
         var hiddenLayers = options.getHiddenLayers();
 
         for (ReanimTrack track : reanim.tracks) {
-            if (hiddenLayers.contains(track.name)) continue;
+            if (hiddenLayers != null && hiddenLayers.contains(track.name)) continue;
             
             var tp = new TransformParams();
             if (!tp.fillWithFrame(track, state.getName(), state.getCurrentFrame(), true)) {

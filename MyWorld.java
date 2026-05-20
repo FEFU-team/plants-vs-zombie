@@ -6,6 +6,7 @@ import java.util.stream.*;
 public class MyWorld extends World {
     private ReanimManager reanimManager = new ReanimManager();
     private SunManager sunManager;
+    private SeedBank seedBank;
     private Level level;
     private boolean isPaused = true;
     private boolean isStopped = false;
@@ -56,6 +57,14 @@ public class MyWorld extends World {
         growPlant(Chomper::new, 4, 3);
 
         sunManager = new SunManager(this, reanimManager);
+        
+        var seeds = new ArrayList<SeedBank.SeedType>();
+        seeds.add(SeedBank.SeedType.SunFlower);
+        seeds.add(SeedBank.SeedType.PeaShooter);
+        seeds.add(SeedBank.SeedType.WallNut);
+        seeds.add(SeedBank.SeedType.PotatoMine);
+        seeds.add(SeedBank.SeedType.Chomper);
+        seedBank = new SeedBank(this, sunManager, reanimManager, seeds);
 
         // Debug: draw hitboxes
         var hitboxMap = new HitboxMap();
@@ -72,6 +81,7 @@ public class MyWorld extends World {
         }
         
         sunManager.lifecycleStop();
+        seedBank.lifecycleStop();
         level.lifecycleStop();
     }
 
@@ -83,12 +93,14 @@ public class MyWorld extends World {
         }
         
         sunManager.lifecycleStart();
+        seedBank.lifecycleStart();
         level.lifecycleStart();
     }
 
     @Override
     public void act() {
         sunManager.act();
+        seedBank.act();
         level.act();
     }
 

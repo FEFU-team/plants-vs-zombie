@@ -1,4 +1,6 @@
 public class Timer {
+    private static final float NANO = 1_000_000_000.f;
+    
     private long lastUpdateTimeNanos;
     private long stopTimeNanos;
     private static float debugMultiplier = 1.f;
@@ -37,17 +39,21 @@ public class Timer {
             stopTimeNanos = lastUpdateTimeNanos;
         }
     }
+    
+    public void add(float delta) {
+        lastUpdateTimeNanos -= (long)(delta * NANO);
+    }
 
     public float getDeltaSeconds() {
         long currentTimeNanos = stopped() ? stopTimeNanos : System.nanoTime();
         long deltaNanos = currentTimeNanos - lastUpdateTimeNanos;
-        return deltaNanos / 1_000_000_000.f * debugMultiplier;
+        return deltaNanos / NANO * debugMultiplier;
     }
 
     public float getDeltaSecondsAndReset() {
         long currentTimeNanos = stopped() ? stopTimeNanos : System.nanoTime();
         long deltaNanos = currentTimeNanos - lastUpdateTimeNanos;
-        float deltaSeconds = deltaNanos / 1_000_000_000.f;
+        float deltaSeconds = deltaNanos / NANO;
         lastUpdateTimeNanos = currentTimeNanos;
 
         return deltaSeconds * debugMultiplier;
