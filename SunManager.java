@@ -10,7 +10,7 @@ public class SunManager {
 
     private MyWorld world;
     private ReanimManager reanimManager;
-    private int sunCount = 0;
+    private int sunCount = 50;
     private Timer spawnTimer = new Timer();
     private Random random = new Random();
 
