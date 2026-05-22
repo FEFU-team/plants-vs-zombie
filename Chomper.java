@@ -10,7 +10,7 @@ public class Chomper extends Plant {
         SWALLOW,
     }
     
-    private static final float CHARGE_INTERVAL = 10.f;
+    private static final float CHARGE_INTERVAL = 42.f;
     private static final float ATTACK_DELAY = 0.9f;
 
     private Timer chargeTimer = new Timer();

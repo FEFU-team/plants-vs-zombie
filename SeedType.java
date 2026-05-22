@@ -9,6 +9,10 @@ public enum SeedType {
         new PlantVisuals("REANIM_PEASHOOTERSINGLE", "anim_full_idle", 3, 4, 0.55f),
         new PlantMechanics(7.5f, true, 100)),
     
+    PeaShooterRepeater(PeaShooterRepeater::new,
+        new PlantVisuals("REANIM_PEASHOOTER", "anim_full_idle", 3, 4, 0.55f),
+        new PlantMechanics(7.5f, true, 200)),
+    
     WallNut(WallNut::new,
         new PlantVisuals("REANIM_WALLNUT", "anim_idle", 4, 10, 0.5f),
         new PlantMechanics(30.f, false, 50)),
@@ -19,7 +23,7 @@ public enum SeedType {
     
     Chomper(Chomper::new,
         new PlantVisuals("REANIM_CHOMPER", "anim_idle", 10, 14, 0.42f),
-        new PlantMechanics(7.5f, false, 150));
+        new PlantMechanics(7.5f, true, 150));
         
     public static record PlantVisuals(
         String reanimKey,

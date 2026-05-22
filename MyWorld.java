@@ -47,13 +47,12 @@ public class MyWorld extends World {
         // TODO: specify types and probabilities of zombies in wave
         
         //некоторые растения для тестов
-        level.growPlant(new SunFlower(reanimManager), 1, 0);
         level.growPlant(new SunFlower(reanimManager), 2, 0);
         level.growPlant(new SunFlower(reanimManager), 3, 0);
-        level.growPlant(new PeaShooter(reanimManager), 1, 1);
+        level.growPlant(new PeaShooterRepeater(reanimManager), 1, 0);
         level.growPlant(new PeaShooter(reanimManager), 2, 1);
         level.growPlant(new SunFlower(reanimManager), 3, 1);
-        level.growPlant(new PeaShooter(reanimManager), 2, 2);
+        level.growPlant(new PeaShooterRepeater(reanimManager), 2, 2);
         level.growPlant(new SunFlower(reanimManager), 3, 2);
         level.growPlant(new SunFlower(reanimManager), 3, 3);
         level.growPlant(new SunFlower(reanimManager), 3, 4);
@@ -64,6 +63,7 @@ public class MyWorld extends World {
         var seeds = new ArrayList<SeedType>();
         seeds.add(SeedType.SunFlower);
         seeds.add(SeedType.PeaShooter);
+        seeds.add(SeedType.PeaShooterRepeater);
         seeds.add(SeedType.WallNut);
         seeds.add(SeedType.PotatoMine);
         seeds.add(SeedType.Chomper);
@@ -122,6 +122,7 @@ public class MyWorld extends World {
                     if (cell != null && level.isCellEmpty(cell.x, cell.y)) {
                         var seedType = selectedPlant.getSeedType();
                         sunManager.spendSun(seedType.getSunCost());
+                        seedBank.resetTimerForSeed(seedType);
                         level.growPlant(seedType.create(reanimManager), cell.x, cell.y);
                     }
                     
@@ -157,7 +158,7 @@ public class MyWorld extends World {
     private void placeSelectedPlantGhost(int mouseX, int mouseY) {
         var cell = level.getCellAt(mouseX, mouseY);
         
-        if (cell == null) {
+        if (cell == null || !level.isCellEmpty(cell.x, cell.y)) {
             removeObject(selectedPlantGhost);
         } else {
             float globalX = Level.CELL_GRID_START_X + cell.x * Cell.WIDTH;

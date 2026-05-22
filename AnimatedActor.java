@@ -168,6 +168,10 @@ abstract public class AnimatedActor extends BaseActor {
         reanimExtraStates.clear();
         addReanimExtraState(state);
     }
+    
+    public boolean hasExtraState(String name) {
+        return reanimExtraStates.stream().anyMatch(state -> state.getName() == name);
+    }
 
     public void setReanimSpeed(float speed) {
         if (reanimKey != null && reanimState != null) {

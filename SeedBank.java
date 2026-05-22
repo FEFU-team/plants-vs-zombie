@@ -205,4 +205,13 @@ public class SeedBank {
         
         return null;
     }
+    
+    public void resetTimerForSeed(SeedType type) {
+        for (var seed : seeds) {
+            if (seed.type == type) {
+                seed.resetReload();
+                break;
+            }
+        }
+    }
 }
