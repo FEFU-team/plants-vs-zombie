@@ -56,4 +56,8 @@ public class Plant extends AnimatedActor {
     protected boolean checkAttackTargets() {
         return findAttackTarget() != null;
     }
+    
+    public boolean isGhost() {
+        return false;
+    }
 }

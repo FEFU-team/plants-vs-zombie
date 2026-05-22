@@ -74,7 +74,7 @@ public class Zombie extends AnimatedActor {
         if (gameIsStopped()) return;
         
         if (currentState == State.DEAD) {
-            if (getReanimCurrentFrame() < 0) {
+            if (isMainReanimFinished()) {
                 var world = getWorld();
                 if (world != null) world.removeObject(this);
             }
@@ -144,7 +144,7 @@ public class Zombie extends AnimatedActor {
         for (Plant plant : getWorld().getObjects(Plant.class)) {
             float distanceX = getRealX() - plant.getX();
 
-            if (hitbox.intersects(plant.getHitbox()) && distanceX > 0 && distanceX < 30) {
+            if (!plant.isGhost() && hitbox.intersects(plant.getHitbox()) && distanceX > 0 && distanceX < 30) {
                 setState(State.EATING);
                 return;
             }
@@ -164,7 +164,7 @@ public class Zombie extends AnimatedActor {
         for (var plant : world.getObjects(Plant.class)) {
             float distanceX = getRealX() - plant.getX();
 
-            if (hitbox.intersects(plant.getHitbox()) && distanceX > 0) {
+            if (!plant.isGhost() && hitbox.intersects(plant.getHitbox()) && distanceX > 0) {
                 plant.takeDamage(attackDelta * attackDamage);
                 return;
             }

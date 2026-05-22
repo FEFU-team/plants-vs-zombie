@@ -61,7 +61,7 @@ public class Chomper extends Plant {
             }
         }
         
-        if (getReanimCurrentFrame() < 0) {
+        if (isMainReanimFinished()) {
             if (state == State.BITE) {
                 setState(State.IDLE);
             } else if (state == State.BITE_EATEN) {
@@ -76,7 +76,7 @@ public class Chomper extends Plant {
             setState(State.SWALLOW);
         }
         
-        if (state == State.SWALLOW && getReanimCurrentFrame() < 0) {
+        if (state == State.SWALLOW && isMainReanimFinished()) {
             setState(State.IDLE);
         }
 
@@ -91,10 +91,9 @@ public class Chomper extends Plant {
     @Override
     public Rectangle.Float getAttackTargetBox() {
         var hitbox = getHitbox();
-        var x = (float)hitbox.getCenterX();
 
         return new Rectangle.Float(
-            x, getRealY() + hitbox.height * 0.2f,
+            (float)hitbox.getCenterX(), hitbox.y + hitbox.height * 0.2f,
             80, hitbox.height * 0.6f
         );
     }

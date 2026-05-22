@@ -24,6 +24,7 @@ public class MyWorld extends World {
             PlantGhost.Transparent.class,
             Sun.class,
             PeaProjectile.class,
+            LawnMower.class,
             Zombie.class,
             Plant.class
         );

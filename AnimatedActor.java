@@ -119,10 +119,6 @@ abstract public class AnimatedActor extends BaseActor {
         return reanimState.name;
     }
 
-    public float getReanimCurrentFrame() {
-        return reanimState != null ? reanimState.currentFrame : -1;
-    }
-
     public void setReanimKey(String key) {
         setReanimKey(key, this.reanimKey);
     }
@@ -169,7 +165,11 @@ abstract public class AnimatedActor extends BaseActor {
         addReanimExtraState(state);
     }
     
-    public boolean hasExtraState(String name) {
+    public boolean isMainReanimFinished() {
+        return !reanimState.loop && reanimState.getCurrentFrame() < 0;
+    }
+    
+    public boolean hasExtraReanimState(String name) {
         return reanimExtraStates.stream().anyMatch(state -> state.getName() == name);
     }
 

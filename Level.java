@@ -53,7 +53,7 @@ public class Level {
         WithCone,
         Polevaulter,
         Bucket,
-        Paper
+        Paper,
     }
     
     public static final int CELL_GRID_START_X = 260;
@@ -160,7 +160,7 @@ public class Level {
             int rowIndex = random.nextInt(5);
             world.addObject(
                 zombie,
-                CELL_GRID_START_X + Cell.WIDTH * 11,
+                CELL_GRID_START_X + Cell.WIDTH * 10,
                 CELL_GRID_START_Y + ((0.1f + rowIndex) * Cell.HEIGHT) - Zombie.TOP_HEIGHT
             );
             
@@ -286,7 +286,7 @@ public class Level {
         var y = (int)(CELL_GRID_START_Y + Cell.HEIGHT * (row + 0.5f));
         
         for (var plant : world.getObjects(Plant.class)) {
-            if (plant.getHitbox().contains(x, y)) {
+            if (!plant.isGhost() && plant.getHitbox().contains(x, y)) {
                 return false;
             }
         }

@@ -84,14 +84,14 @@ public class ZombiePolevaulter extends Zombie {
         var hitbox = getHitbox();
         for (Plant plant : world.getObjects(Plant.class)) {
             float distanceX = getRealX() - plant.getX();
-            if (hitbox.intersects(plant.getHitbox()) && distanceX > 0 && distanceX < 70) {
+            if (!plant.isGhost() && hitbox.intersects(plant.getHitbox()) && distanceX > 0 && distanceX < 70) {
                 setState(PolevaulterState.JUMPING);
                 return;
             }
         }
     }
     protected void handleJumpLogic() {
-        // TODO: fix to jump over choper before be eaten
+        // TODO: fix to jump over Chomper before be eaten
         float elapsed = jumpTimer.getDeltaSeconds();
 
         if (elapsed < JUMP_DURATION) {
