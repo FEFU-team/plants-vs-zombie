@@ -1,6 +1,7 @@
 import greenfoot.*;
 import java.util.*;
 import java.awt.Rectangle;
+import java.awt.Point;
 
 public class Level {
     public static class Wave {
@@ -52,7 +53,7 @@ public class Level {
         WithCone,
         Polevaulter,
         Bucket,
-        Paper
+        Paper,
     }
     
     public static final int CELL_GRID_START_X = 260;
@@ -67,6 +68,7 @@ public class Level {
     private ReanimManager reanimManager;
     private Random random = new Random();
     private Style style;
+    private boolean isGameOver = false;
     
     private List<Wave> waves;
     private int currentWaveIdx = -1;
@@ -158,7 +160,7 @@ public class Level {
             int rowIndex = random.nextInt(5);
             world.addObject(
                 zombie,
-                CELL_GRID_START_X + Cell.WIDTH * 11,
+                CELL_GRID_START_X + Cell.WIDTH * 10,
                 CELL_GRID_START_Y + ((0.1f + rowIndex) * Cell.HEIGHT) - Zombie.TOP_HEIGHT
             );
             
@@ -191,10 +193,12 @@ public class Level {
     
     public void createLawn() {
         if (style == Style.POOL_DAY || style == Style.POOL_NIGHT) {
+            throw new UnsupportedOperationException("Pool style is not yet implemented");
             // TODO: maybe add but i think it's too hard for our project
             // Pool levels have 6 rows instead of 5
             // Also need to render pool, and draw swimming zombies
         } else if (style == Style.ROOF_DAY || style == Style.ROOF_NIGHT) {
+            throw new UnsupportedOperationException("Roof style is not yet implemented");
             // TODO: maybe add but i think it's too hard for our project
         } else {
             if (style == Style.GARDEN_NIGHT) {
@@ -213,7 +217,13 @@ public class Level {
         }
     }
     
+    public void growPlant(Plant plant, int x, int y) {
+        world.addObject(plant, (float)Level.CELL_GRID_START_X + x * Cell.WIDTH, (float)Level.CELL_GRID_START_Y + y * Cell.HEIGHT);
+    }
+    
     public void checkGameStatus() {
+        if (isGameOver) return;
+        
         var zombies = world.getObjects(Zombie.class);
         if (zombies.isEmpty()) {
             var lastWave = waves.getLast();
@@ -225,15 +235,62 @@ public class Level {
         
         for (var zombie : zombies) {
             if (zombie.isWon()) {
+                isGameOver = true;
                 world.removeObject(zombie);
                 world.stopGame();
                 world.addObject(new ZombiesWon(reanimManager), ZombiesWon.POSITION_X, ZombiesWon.POSITION_Y);
-                
             }
         }
     }
 
     public Rectangle.Float getWinHitbox() {
         return new Rectangle.Float(0, 0, CELL_GRID_START_X - Cell.WIDTH, world.getHeight());
+    }
+    
+    public int getColsCount() {
+        if (style == Style.POOL_DAY || style == Style.POOL_NIGHT) {
+            return 0;
+        } else if (style == Style.ROOF_DAY || style == Style.ROOF_NIGHT) {
+            return 0;
+        } else {
+            return 9;
+        }
+    }
+    
+    public int getRowsCount() {
+        if (style == Style.POOL_DAY || style == Style.POOL_NIGHT) {
+            return 0;
+        } else if (style == Style.ROOF_DAY || style == Style.ROOF_NIGHT) {
+            return 0;
+        } else {
+            return 5;
+        }
+    }
+    
+    public Point getCellAt(int x, int y) {
+        var col = (int)Math.floor((float)(x - Level.CELL_GRID_START_X) / (float)Cell.WIDTH);
+        var row = (int)Math.floor((float)(y - Level.CELL_GRID_START_Y) / (float)Cell.HEIGHT);
+        
+        if (
+            col >= 0 && col < getColsCount()
+            && row >= 0 && row < getRowsCount()
+        ) {
+            return new Point(col, row);
+        } else {
+            return null;
+        }
+    }
+    
+    public boolean isCellEmpty(int col, int row) {
+        var x = (int)(CELL_GRID_START_X + Cell.WIDTH * (col + 0.5f));
+        var y = (int)(CELL_GRID_START_Y + Cell.HEIGHT * (row + 0.5f));
+        
+        for (var plant : world.getObjects(Plant.class)) {
+            if (!plant.isGhost() && plant.getHitbox().contains(x, y)) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 }

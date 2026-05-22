@@ -30,12 +30,14 @@ public class HitboxMap extends Actor {
             img.clear();
             
             if (showCellBoxes && world instanceof MyWorld myWorld) {
-                var winBox = myWorld.getLevel().getWinHitbox();
+                var level = myWorld.getLevel();
+                
+                var winBox = level.getWinHitbox();
                 img.setColor(Color.BLUE);
                 img.drawRect((int)winBox.x, (int)winBox.y, (int)winBox.width, (int)winBox.height);
                 
-                for (int i = 0; i < 9; ++i) {
-                    for (int j = 0; j < 5; ++j) {
+                for (int i = 0; i < level.getColsCount(); ++i) {
+                    for (int j = 0; j < level.getRowsCount(); ++j) {
                         img.setColor(Color.BLUE);
                         img.drawRect(
                             Level.CELL_GRID_START_X + i * Cell.WIDTH,

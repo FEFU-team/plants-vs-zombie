@@ -10,8 +10,8 @@ public class MyWorld extends World {
     private Level level;
     private boolean isPaused = true;
     private boolean isStopped = false;
-    private java.awt.Rectangle[][] cellGrid = new java.awt.Rectangle[9][5];
-    private SeedBank.Seed selectedSeed = null;
+    private PlantGhost selectedPlant;
+    private PlantGhost selectedPlantGhost;
 
     public MyWorld() {
         super(1000, 600, 1);
@@ -20,8 +20,11 @@ public class MyWorld extends World {
         setPaintOrder(
             HitboxMap.class,
             ZombiesWon.class,
+            PlantGhost.class,
+            PlantGhost.Transparent.class,
             Sun.class,
             PeaProjectile.class,
+            LawnMower.class,
             Zombie.class,
             Plant.class
         );
@@ -45,40 +48,33 @@ public class MyWorld extends World {
         // TODO: specify types and probabilities of zombies in wave
         
         //некоторые растения для тестов
-        growPlant(SunFlower::new, 1, 0);
-        growPlant(SunFlower::new, 2, 0);
-        growPlant(SunFlower::new, 3, 0);
-        growPlant(PeaShooter::new, 1, 1);
-        growPlant(PeaShooter::new, 2, 1);
-        growPlant(SunFlower::new, 3, 1);
-        growPlant(PeaShooter::new, 2, 2);
-        growPlant(SunFlower::new, 3, 2);
-        growPlant(SunFlower::new, 3, 3);
-        growPlant(SunFlower::new, 3, 4);
-        growPlant(Chomper::new, 4, 3);
+        level.growPlant(new SunFlower(reanimManager), 2, 0);
+        level.growPlant(new SunFlower(reanimManager), 3, 0);
+        level.growPlant(new PeaShooterRepeater(reanimManager), 1, 0);
+        level.growPlant(new PeaShooter(reanimManager), 2, 1);
+        level.growPlant(new SunFlower(reanimManager), 3, 1);
+        level.growPlant(new PeaShooterRepeater(reanimManager), 2, 2);
+        level.growPlant(new SunFlower(reanimManager), 3, 2);
+        level.growPlant(new SunFlower(reanimManager), 3, 3);
+        level.growPlant(new SunFlower(reanimManager), 3, 4);
+        level.growPlant(new Chomper(reanimManager), 4, 3);
 
         sunManager = new SunManager(this, reanimManager);
         
-        var seeds = new ArrayList<SeedBank.SeedType>();
-        seeds.add(SeedBank.SeedType.SunFlower);
-        seeds.add(SeedBank.SeedType.PeaShooter);
-        seeds.add(SeedBank.SeedType.WallNut);
-        seeds.add(SeedBank.SeedType.PotatoMine);
-        seeds.add(SeedBank.SeedType.Chomper);
+        var seeds = new ArrayList<SeedType>();
+        seeds.add(SeedType.SunFlower);
+        seeds.add(SeedType.PeaShooter);
+        seeds.add(SeedType.PeaShooterRepeater);
+        seeds.add(SeedType.WallNut);
+        seeds.add(SeedType.PotatoMine);
+        seeds.add(SeedType.Chomper);
         seedBank = new SeedBank(this, sunManager, reanimManager, seeds);
+        
         // Debug: draw hitboxes
         var hitboxMap = new HitboxMap();
         hitboxMap.toggleAttackBoxes(true);
         hitboxMap.toggleCellBoxes(true);
         addObject(hitboxMap, getWidth() / 2, getHeight() / 2);
-        for (int i = 0; i < 9; ++i) {
-            for (int j = 0; j < 5; ++j) {
-                int cellLeftX = Level.CELL_GRID_START_X + i * Cell.WIDTH;
-                int cellTopY = Level.CELL_GRID_START_Y + j * Cell.HEIGHT;
-                
-                cellGrid[i][j] = new java.awt.Rectangle(cellLeftX, cellTopY, Cell.WIDTH, Cell.HEIGHT);
-            }
-        }
     }
 
     @Override
@@ -110,11 +106,72 @@ public class MyWorld extends World {
         sunManager.act();
         seedBank.act();
         level.act();
+        
+        checkForPlantBuy();
     }
-    public void setSelectedSeed(SeedBank.Seed seed) {
-        this.selectedSeed = seed;
+    
+    public void checkForPlantBuy() {
+        var mouse = Greenfoot.getMouseInfo();
+        if (mouse != null) {
+            if (selectedPlant != null) {
+                if (Greenfoot.mouseClicked(null)) {
+                    removeObject(selectedPlant);
+                    removeObject(selectedPlantGhost);
+                    
+                    var cell = level.getCellAt(mouse.getX(), mouse.getY());
+                    
+                    if (cell != null && level.isCellEmpty(cell.x, cell.y)) {
+                        var seedType = selectedPlant.getSeedType();
+                        sunManager.spendSun(seedType.getSunCost());
+                        seedBank.resetTimerForSeed(seedType);
+                        level.growPlant(seedType.create(reanimManager), cell.x, cell.y);
+                    }
+                    
+                    selectedPlant = null;
+                    selectedPlantGhost = null;
+                } else {
+                    selectedPlant.setLocation(
+                        (float)mouse.getX() - selectedPlant.getHitboxWidth() / 2,
+                        (float)mouse.getY() - selectedPlant.getHitboxHeight() / 2
+                    );
+                    placeSelectedPlantGhost(mouse.getX(), mouse.getY());
+                }
+            } else if (Greenfoot.mousePressed(null)) {
+                var seedType = seedBank.getReadySeedAt(mouse.getX(), mouse.getY());
+                if (seedType != null) {
+                    selectedPlant = new PlantGhost(reanimManager, seedType);
+                    addObject(
+                        selectedPlant,
+                        (float)mouse.getX() - selectedPlant.getHitboxWidth() / 2,
+                        (float)mouse.getY() - selectedPlant.getHitboxHeight() / 2
+                    );
+                    
+                    selectedPlantGhost = new PlantGhost.Transparent(reanimManager, seedType);
+                    placeSelectedPlantGhost(mouse.getX(), mouse.getY());
+                }
+            }
+        } else {
+            removeObject(selectedPlant);
+            selectedPlant = null;
+        }
     }
-
+    
+    private void placeSelectedPlantGhost(int mouseX, int mouseY) {
+        var cell = level.getCellAt(mouseX, mouseY);
+        
+        if (cell == null || !level.isCellEmpty(cell.x, cell.y)) {
+            removeObject(selectedPlantGhost);
+        } else {
+            float globalX = Level.CELL_GRID_START_X + cell.x * Cell.WIDTH;
+            float globalY = Level.CELL_GRID_START_Y + cell.y * Cell.HEIGHT;
+            
+            if (selectedPlantGhost.getWorld() == null) {
+                addObject(selectedPlantGhost, globalX, globalY);
+            } else {
+                selectedPlantGhost.setLocation(globalX, globalY);
+            }
+        }
+    }
 
     @Override
     public void addObject(Actor actor, int x, int y) {
@@ -130,10 +187,6 @@ public class MyWorld extends World {
         if (!isPaused) {
             actor.lifecycleStart();
         }
-    }
-
-    void growPlant(Function<ReanimManager, ? extends Plant> create, int x, int y) {
-        addObject(create.apply(reanimManager), (float)Level.CELL_GRID_START_X + x * Cell.WIDTH, (float)Level.CELL_GRID_START_Y + y * Cell.HEIGHT);
     }
     
     public boolean gameIsStopped() {

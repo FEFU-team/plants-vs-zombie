@@ -7,12 +7,12 @@ public class Plant extends AnimatedActor {
 
     @Override
     public float getHitboxWidth() {
-        return 80; // TODO: adjust
+        return 80;
     }
 
     @Override
     public float getHitboxHeight() {
-        return 90; // TODO: adjust
+        return 90;
     }
 
     public Rectangle.Float getAttackTargetBox() {
@@ -55,5 +55,9 @@ public class Plant extends AnimatedActor {
     
     protected boolean checkAttackTargets() {
         return findAttackTarget() != null;
+    }
+    
+    public boolean isGhost() {
+        return false;
     }
 }

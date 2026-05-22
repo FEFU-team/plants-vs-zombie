@@ -2,19 +2,22 @@ import greenfoot.*;
 import java.awt.Rectangle;
 
 public class PeaShooter extends Plant {
-    private static final float ATTACK_INTERVAL = 1.425f;
-    private static final float ATTACK_DELAY = 0.6f; // TODO: speed up shoot animation, and reduce delay
+    protected static final float ATTACK_INTERVAL = 1.425f;
 
-    private Timer attackTimer = new Timer();
-    private boolean attackDelayActive = false;
-    private Timer attackDelayTimer = new Timer();
+    protected Timer attackTimer = new Timer();
+    protected boolean attackDelayActive = false;
+    protected Timer attackDelayTimer = new Timer();
 
-    public PeaShooter(ReanimManager manager) {
-        super(manager, "REANIM_PEASHOOTERSINGLE", 300);
+    protected PeaShooter(ReanimManager manager, String reanimKey) {
+        super(manager, reanimKey, 300);
 
         setReanimState("anim_full_idle");
-        setReanimSpeed(1.3f);
+        setReanimSpeed(1.6f);
         updateFrame();
+    }
+
+    public PeaShooter(ReanimManager manager) {
+        this(manager, "REANIM_PEASHOOTERSINGLE");
     }
 
     @Override
@@ -41,7 +44,7 @@ public class PeaShooter extends Plant {
     public void act() {
         if (gameIsStopped()) return;
         
-        if (attackDelayActive && attackDelayTimer.getDeltaSeconds() > ATTACK_DELAY) {
+        if (attackDelayActive && attackDelayTimer.getDeltaSeconds() > getAttackDelay()) {
             attackDelayActive = false;
             attackDelayTimer.stop();
             attackDelayTimer.reset();
@@ -52,13 +55,7 @@ public class PeaShooter extends Plant {
             attackDelayActive = true;
             attackDelayTimer.start();
             attackTimer.reset();
-            setReanimExtraState(
-                new AnimationStateBuilder()
-                    .name("anim_shooting")
-                    .speed(1.3f)
-                    .loop(false)
-                    .build()
-            );
+            playShootAnimation();
         }
 
         super.act();
@@ -77,15 +74,33 @@ public class PeaShooter extends Plant {
             world.getWidth() - x, hitbox.height * 0.6f
         );
     }
+    
+    public float getAttackDelay() {
+        return 0.35f;
+    }
+    
+    public float getAttackAnimationSpeed() {
+        return 2.5f;
+    }
+    
+    protected void playShootAnimation() {
+        setReanimExtraState(
+            new AnimationStateBuilder()
+                .name("anim_shooting")
+                .speed(getAttackAnimationSpeed())
+                .loop(false)
+                .build()
+        );
+    }
 
-    public void shoot() {
+    protected void shoot() {
         var world = getWorld();
         if (world != null) {
             var hitbox = getHitbox();
             world.addObject(
                 new PeaProjectile(reanimManager),
-                (int)(hitbox.x + hitbox.width * 0.85),
-                (int)(hitbox.y + hitbox.height * 0.25)
+                (int)(hitbox.x + hitbox.width * 0.96),
+                (int)(hitbox.y + hitbox.height * 0.3)
             );
         }
     }
