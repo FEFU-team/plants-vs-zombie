@@ -37,7 +37,7 @@ public class MainMenu extends World
             "images/reanim/SelectorScreen_BG_Left.jpg",
             "images/reanim/SelectorScreen_BG_Left_.png"
         );
-       
+       drawBlueSky(canvas);
         canvas.drawImage(new GreenfootImage("images/reanim/SelectorScreen_BG.jpg"),0,0);
         canvas.drawImage(house, 40, 250);
          canvas.drawImage(bg, 290, 40);
@@ -104,5 +104,29 @@ public class MainMenu extends World
             e.printStackTrace();
             return new GreenfootImage(100, 50);
         }
+    }
+    private void drawBlueSky(GreenfootImage canvas) 
+    {
+        int skyHeight = 500; // Высота неба (остальное закроет панель и газон)
+        
+        // Цвета градиента: сверху темнее, к горизонту светлее
+        Color topColor    = new Color(100, 180, 230);
+        Color bottomColor = new Color(180, 220, 255);
+        
+        for (int y = 0; y < skyHeight; y++) {
+            float ratio = (float) y / skyHeight;
+            
+            // Линейная интерполяция цвета
+            int r = (int) (topColor.getRed() * (1 - ratio) + bottomColor.getRed() * ratio);
+            int g = (int) (topColor.getGreen() * (1 - ratio) + bottomColor.getGreen() * ratio);
+            int b = (int) (topColor.getBlue() * (1 - ratio) + bottomColor.getBlue() * ratio);
+            
+            canvas.setColor(new Color(r, g, b));
+            canvas.fillRect(0, y, 1000, 1); // Рисуем полоску высотой 1px
+        }
+        
+        // Если хочешь просто однотонное небо без градиента, замени цикл на:
+        // canvas.setColor(new Color(135, 206, 250));
+        // canvas.fillRect(0, 0, 1000, skyHeight);
     }
 }
