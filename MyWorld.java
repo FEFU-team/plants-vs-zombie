@@ -75,6 +75,7 @@ public class MyWorld extends World {
         hitboxMap.toggleAttackBoxes(true);
         hitboxMap.toggleCellBoxes(true);
         addObject(hitboxMap, getWidth() / 2, getHeight() / 2);
+        started(); // добавил это как игра только после нажатия на паузу и снятие начинается 
     }
 
     @Override

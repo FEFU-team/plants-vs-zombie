@@ -1,19 +1,38 @@
-import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
+import greenfoot.*;
 
 /**
- * Write a description of class MenuButton here.
- * 
- * @author (your name) 
- * @version (a version number or a date)
+ * Простая кнопка с двумя состояниями: обычная и нажатая.
  */
-public class MenuButton extends Actor
+public class MenuButton extends Actor 
 {
+    private final GreenfootImage normalImg;
+    private final GreenfootImage pressedImg;
+    private final Runnable action;
+
     /**
-     * Act - do whatever the MenuButton wants to do. This method is called whenever
-     * the 'Act' or 'Run' button gets pressed in the environment.
+     * Конструктор кнопки.
+     * @param normal  Картинка в обычном состоянии
+     * @param pressed Картинка при наведении/нажатии
+     * @param onClick Что сделать при клике
      */
-    public void act()
+    public MenuButton(String normal, String pressed, Runnable onClick) 
     {
-        // Add your action code here.
+        this.normalImg = new GreenfootImage(normal);
+        this.pressedImg = new GreenfootImage(pressed);
+        this.action = onClick;
+        setImage(normalImg);
+    }
+
+    public void act() 
+    {
+        if (Greenfoot.mouseMoved(this) || Greenfoot.mousePressed(this)) {
+            setImage(pressedImg);
+        } else if (Greenfoot.mouseMoved(null)) {
+            setImage(normalImg);
+        }
+
+        if (Greenfoot.mouseClicked(this) && action != null) {
+            action.run();
+        }
     }
 }
