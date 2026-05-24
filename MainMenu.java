@@ -13,13 +13,21 @@ public class MainMenu extends World
     {    
         super(1000, 600, 1); 
         setBackground(buildBackground());
-        // ADVENTURE
-        
+       
+        addButton();
+   
+    }
+    private void addButton(){
+        //Adventure
     addObject(new MenuButton(
     "images/reanim/SelectorScreen_Adventure_button.png",  
     "images/reanim/SelectorScreen_Adventure_highlight.png", () -> Greenfoot.setWorld(new MyWorld())), 780, 200);
+      //Quit
+    addObject(new MenuButton(
+    "images/SelectorScreen_Quit1.png",
+    "images/SelectorScreen_Quit2.png",
+    () -> Greenfoot.stop()), 960, 525);
     }
-    
     private GreenfootImage buildBackground() 
     {
         GreenfootImage canvas = new GreenfootImage(1000, 600);
