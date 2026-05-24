@@ -125,8 +125,6 @@ public class MainMenu extends World
             canvas.fillRect(0, y, 1000, 1); // Рисуем полоску высотой 1px
         }
         
-        // Если хочешь просто однотонное небо без градиента, замени цикл на:
-        // canvas.setColor(new Color(135, 206, 250));
-        // canvas.fillRect(0, 0, 1000, skyHeight);
+        
     }
 }
