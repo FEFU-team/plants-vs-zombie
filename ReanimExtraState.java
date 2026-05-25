@@ -4,4 +4,12 @@ public interface ReanimExtraState {
     float getCurrentFrame();
     
     float getInitFrame();
+    
+    default boolean isIndependent() {
+        return false;
+    }
+    
+    default boolean isStatic() {
+        return false;
+    }
 }
