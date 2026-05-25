@@ -10,7 +10,7 @@ public class SelectorScreen extends AnimatedActor {
         StartAdventure("StartAdventure", "STARTADVENTURE_BUTTON1", "STARTADVENTURE_HIGHLIGHT"),
         Adventure("Adventure", "ADVENTURE_BUTTON", "ADVENTURE_HIGHLIGHT"),
         MiniGames("Survival", "SURVIVAL_BUTTON", "SURVIVAL_HIGHLIGHT"),
-        Challenges("Challenges", "CHALLENGES_BUTTON", "CHALLENGES_HIGHLIGHT"),
+        Puzzle("Challenges", "CHALLENGES_BUTTON", "CHALLENGES_HIGHLIGHT"),
         Survival("ZenGarden", "VASEBREAKER_BUTTON", "VASEBREAKER_HIGHLIGHT");
         
         private final String reanimTrackButtonName;
@@ -37,7 +37,8 @@ public class SelectorScreen extends AnimatedActor {
     };
     
     private boolean openAnimationFinished = false;
-    private EnumSet<Button> shownButtons = EnumSet.allOf(Button.class);
+    private Set<Button> shownButtons = EnumSet.allOf(Button.class);
+    private Map<Button, Runnable> buttonCallbacks = new EnumMap<>(Button.class);
     private Button currentHoveredButton;
     
     public SelectorScreen(ReanimManager manager) {
@@ -56,16 +57,14 @@ public class SelectorScreen extends AnimatedActor {
         addReanimExtraState(new AnimationStateBuilder().name("anim_grass").speed(0.5f).build());
         setReanimSpeed(0.7f);
         
-        for (var button : Button.values()) {
-            //hideButton(button);
-        }
+        hideButton(Button.Adventure);
         
         setCanvas(new GreenfootImage(1600, 1200));
         updateFrame();
     }
     
     public void hideButton(Button button) {
-        if (shownButtons.contains(button)) return;
+        if (!shownButtons.contains(button)) return;
         
         var reanimTrackButtonName = button.getReanimTrackButtonName();
         
@@ -76,7 +75,7 @@ public class SelectorScreen extends AnimatedActor {
     }
     
     public void showButton(Button button) {
-        if (!shownButtons.contains(button)) return;
+        if (shownButtons.contains(button)) return;
         
         var reanimTrackButtonName = button.getReanimTrackButtonName();
         
@@ -92,6 +91,10 @@ public class SelectorScreen extends AnimatedActor {
     
     public void darkenButton(Button button) {
         removeImageSwap(button.getInactiveImageKey());
+    }
+    
+    public void addButtonCallback(Button button, Runnable callback) {
+        buttonCallbacks.put(button, callback);
     }
     
     @Override
@@ -129,6 +132,11 @@ public class SelectorScreen extends AnimatedActor {
                 if (currentHoveredButton != null) darkenButton(currentHoveredButton);
                 if (newHovered != null) highlightButton(newHovered);
                 currentHoveredButton = newHovered;
+            }
+            
+            if (currentHoveredButton != null && Greenfoot.mouseClicked(null)) {
+                var callback = buttonCallbacks.get(currentHoveredButton);
+                if (callback != null) callback.run();
             }
         }
     }

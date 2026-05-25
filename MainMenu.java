@@ -15,7 +15,17 @@ public class MainMenu extends World {
         reanimManager.loadImages("./images", "IMAGE_");
         reanimManager.loadImages("./images/reanim", "IMAGE_REANIM_");
         
-        addObject(new SelectorScreen(reanimManager), (int)SelectorScreen.POSITION_X, (int)SelectorScreen.POSITION_Y);
+        var selectorScreen = new SelectorScreen(reanimManager);
+        selectorScreen.hideButton(SelectorScreen.Button.MiniGames);
+        selectorScreen.hideButton(SelectorScreen.Button.Puzzle);
+        selectorScreen.hideButton(SelectorScreen.Button.Survival);
+        selectorScreen.updateFrame();
+        addObject(selectorScreen, (int)SelectorScreen.POSITION_X, (int)SelectorScreen.POSITION_Y);
+        
+        selectorScreen.addButtonCallback(
+            SelectorScreen.Button.StartAdventure,
+            () -> Greenfoot.setWorld(new MyWorld(reanimManager))
+        );
         
         // TODO: maybe quit button is superfluous for Greenfoot
     }
