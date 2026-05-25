@@ -4,7 +4,7 @@ import java.util.function.Function;
 import java.util.stream.*;
 
 public class MyWorld extends World {
-    private ReanimManager reanimManager = new ReanimManager();
+    private ReanimManager reanimManager;
     private SunManager sunManager;
     private SeedBank seedBank;
     private Level level;
@@ -13,9 +13,8 @@ public class MyWorld extends World {
     private PlantGhost selectedPlant;
     private PlantGhost selectedPlantGhost;
 
-    public MyWorld() {
+    public MyWorld(ReanimManager reanimManager) {
         super(1000, 600, 1);
-        Greenfoot.setSpeed(50);
         
         setPaintOrder(
             HitboxMap.class,
@@ -28,10 +27,8 @@ public class MyWorld extends World {
             Zombie.class,
             Plant.class
         );
-
-        reanimManager.loadReanims("./reanim", "REANIM_");
-        reanimManager.loadImages("./images", "IMAGE_");
-        reanimManager.loadImages("./images/reanim", "IMAGE_REANIM_");
+        
+        this.reanimManager = reanimManager;
 
         level = new Level(
             this,
@@ -75,6 +72,8 @@ public class MyWorld extends World {
         hitboxMap.toggleAttackBoxes(true);
         hitboxMap.toggleCellBoxes(true);
         addObject(hitboxMap, getWidth() / 2, getHeight() / 2);
+        
+        started();
     }
 
     @Override

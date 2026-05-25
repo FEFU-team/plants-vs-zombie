@@ -9,6 +9,8 @@ abstract public class AnimatedActor extends BaseActor {
         private float initFrame;
         private float speed = 1.f;
         private boolean loop;
+        private boolean independent;
+        private boolean isStatic;
         
         private AnimationState(String name, boolean loop) {
             this(name, -1.f, -1.f, loop);
@@ -48,6 +50,16 @@ abstract public class AnimatedActor extends BaseActor {
         public float getInitFrame() {
             return initFrame;
         }
+        
+        @Override
+        public boolean isIndependent() {
+            return independent;
+        }
+        
+        @Override
+        public boolean isStatic() {
+            return isStatic;
+        }
     }
     
     public static class AnimationStateBuilder {
@@ -55,6 +67,8 @@ abstract public class AnimatedActor extends BaseActor {
         private float initFrame = -1.f;
         private float speed = 1.f;
         private boolean loop = true;
+        private boolean independent = false;
+        private boolean isStatic = false;
     
         public AnimationStateBuilder name(String name) {
             this.name = name;
@@ -73,6 +87,18 @@ abstract public class AnimatedActor extends BaseActor {
     
         public AnimationStateBuilder loop(boolean loop) {
             this.loop = loop;
+            this.isStatic = false;
+            return this;
+        }
+    
+        public AnimationStateBuilder independent(boolean independent) {
+            this.independent = independent;
+            return this;
+        }
+    
+        public AnimationStateBuilder isStatic(boolean isStatic) {
+            this.isStatic = isStatic;
+            this.loop = false;
             return this;
         }
     
@@ -83,6 +109,8 @@ abstract public class AnimatedActor extends BaseActor {
 
             var state = new AnimationState(name, initFrame, loop);
             state.speed = speed;
+            state.independent = independent;
+            state.isStatic = isStatic;
             return state;
         }
     }
@@ -133,6 +161,17 @@ abstract public class AnimatedActor extends BaseActor {
         }
     }
 
+    public void setReanimState(AnimationState state) {
+        if (reanimState != null && (state == null || reanimState.name == null || !reanimState.name.equals(state))) {
+            if (state.initFrame < 0.f) {
+                state.initFrame = reanimManager.getFirstFrame(reanimKey, state.getName());
+                state.currentFrame = state.initFrame;
+            }
+            
+            reanimState = state;
+        }
+    }
+
     public void setReanimState(String state) {
         setReanimState(state, true);
     }
@@ -142,9 +181,12 @@ abstract public class AnimatedActor extends BaseActor {
             reanimState.name = state;
             reanimState.loop = loop;
             reanimState.currentFrame = reanimManager.getFirstFrame(this.reanimKey, this.reanimState.name);
-            reanimExtraStates.clear();
             frameTimer.reset();
         }
+    }
+    
+    public void clearReanimExtraStates() {
+        reanimExtraStates.clear();
     }
     
     public void addReanimExtraState(AnimationState state) {
@@ -192,7 +234,7 @@ abstract public class AnimatedActor extends BaseActor {
     }
     
     public void removeImageSwap(String srcName) {
-        hiddenLayers.remove(srcName);
+        imageSwaps.remove(srcName);
     }
 
     @Override
@@ -219,7 +261,7 @@ abstract public class AnimatedActor extends BaseActor {
             float framesPassed = getFramesPassedAndUpdateTimer();
             
             var states = reanimExtraStates.stream();
-            if (reanimState.loop || reanimState.currentFrame >= 0.f) {
+            if (!reanimState.isStatic && (reanimState.loop || reanimState.currentFrame >= 0.f)) {
                 states = Stream.concat(Stream.of(reanimState), states);
             }
 
@@ -228,35 +270,41 @@ abstract public class AnimatedActor extends BaseActor {
             });
             
             reanimExtraStates.removeIf(state -> !state.loop && state.currentFrame < 0.f);
-            
-            var options = new ReanimRenderOptions() {
-                public ReanimExtraState getMainState() {
-                    return reanimState;
-                }
-    
-                public List<AnimationState> getExtraStates() {
-                    return reanimExtraStates;
-                }
-                
-                public Set<String> getHiddenLayers() {
-                    return hiddenLayers;
-                }
-                
-                public Map<String, String> getImageSwaps() {
-                    return imageSwaps;
-                }
-                
-                public GreenfootImage getCanvas() {
-                    return canvas;
-                }
-            };
 
-            canvas = reanimManager.renderSprite(reanimKey, options);
+            canvas = reanimManager.renderSprite(reanimKey, getReanimRenderOptions());
             setImage(canvas);
         }
     }
     
-    float getFramesPassedAndUpdateTimer() {
+    private ReanimRenderOptions getReanimRenderOptions() {
+        return new ReanimRenderOptions() {
+            public ReanimExtraState getMainState() {
+                return reanimState;
+            }
+
+            public List<AnimationState> getExtraStates() {
+                return reanimExtraStates;
+            }
+            
+            public Set<String> getHiddenLayers() {
+                return hiddenLayers;
+            }
+            
+            public Map<String, String> getImageSwaps() {
+                return imageSwaps;
+            }
+            
+            public GreenfootImage getCanvas() {
+                return canvas;
+            }
+        };
+    }
+    
+    private float getFramesPassedAndUpdateTimer() {
         return frameTimer.getDeltaSecondsAndReset() * reanimManager.getFPS(reanimKey);
+    }
+    
+    protected boolean checkHoverLayer(int x, int y, String trackName) {
+        return reanimManager.checkHoverLayer(x, y, reanimKey, trackName, getReanimRenderOptions());
     }
 }
