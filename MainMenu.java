@@ -10,7 +10,6 @@ public class MainMenu extends World {
     public MainMenu()  {
         super(800, 600, 1);
         Greenfoot.setSpeed(50);
-        
         reanimManager.loadReanims("./reanim", "REANIM_");
         reanimManager.loadImages("./images", "IMAGE_");
         reanimManager.loadImages("./images/reanim", "IMAGE_REANIM_");

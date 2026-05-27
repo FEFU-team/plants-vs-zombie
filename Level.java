@@ -58,7 +58,7 @@ public class Level {
     
     public static final int CELL_GRID_START_X = 260;
     public static final int CELL_GRID_START_Y = 80;
-    
+    public static final String myFont = "HouseofTerror";
     private static final int WAVE_APPROACH_MESSAGE_INTERVAL = 5;
     private static final int WAVE_MESSAGE_HIDE_INTERVAL = 5;
     
@@ -116,19 +116,20 @@ public class Level {
 
     private void tryToSpawnZombieWave() {
         if (currentWaveIdx >= waves.size() - 1) return;
-        
+         
         if (levelTimer.getDeltaSeconds() < waves.get(currentWaveIdx + 1).startsAt) {
             if (levelTimer.getDeltaSeconds() > waves.get(currentWaveIdx + 1).startsAt - WAVE_APPROACH_MESSAGE_INTERVAL) {
-                world.showText("A Wave of Zombies is Approaching", 500, 200);
+            world.addObject(new CustomText("A Wave of Zombies is Approaching", myFont, 30, Color.RED), 600,250);
             } else if (currentWaveIdx >= 0 && levelTimer.getDeltaSeconds() > waves.get(currentWaveIdx).startsAt + WAVE_MESSAGE_HIDE_INTERVAL) {
-                world.showText("", 500, 200);
+                //world.showText("", 500, 200);
+                world.addObject(new CustomText("", myFont, 30, Color.RED), 600,250);
             }
             return;
         }
         
         ++currentWaveIdx;
-        
-        world.showText("The wave " + (currentWaveIdx + 1) + " has begun!", 500, 200);
+        world.addObject(new CustomText("The wave " + (currentWaveIdx + 1) + " has begun!", myFont, 30, Color.RED), 600,250);
+        //world.showText("The wave " + (currentWaveIdx + 1) + " has begun!", 500, 200);
         nextZombieSpawnTime = levelTimer.getDeltaSeconds() + ZOMBIE_SPAWN_DELAY;
     }
     
@@ -228,7 +229,8 @@ public class Level {
         if (zombies.isEmpty()) {
             var lastWave = waves.getLast();
             if (lastWave.zombiesSpawned == lastWave.totalZombies) {
-                world.showText("Victory!", 500, 300);
+                //world.showText("Victory!", 500, 300);
+                world.addObject(new CustomText("Victory!", myFont, 30, Color.RED), 600,250);
                 Greenfoot.stop();
             }
         }
