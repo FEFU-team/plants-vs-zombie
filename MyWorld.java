@@ -5,6 +5,7 @@ import java.util.stream.*;
 import java.awt.Font;
 import java.io.File;
 import java.awt.GraphicsEnvironment;
+
 public class MyWorld extends World {
     private ReanimManager reanimManager;
     private SunManager sunManager;
@@ -20,6 +21,7 @@ public class MyWorld extends World {
         setPaintOrder(
             HitboxMap.class,
             ZombiesWon.class,
+            CustomText.class,
             PlantGhost.class,
             PlantGhost.Transparent.class,
             Sun.class,
@@ -28,7 +30,9 @@ public class MyWorld extends World {
             Zombie.class,
             Plant.class
         );
-       registerCustomFont("HouseofTerrorRegular.otf");
+
+        registerCustomFont("HouseofTerrorRegular.otf");
+
         this.reanimManager = reanimManager;
 
         level = new Level(
@@ -44,8 +48,10 @@ public class MyWorld extends World {
         // TODO: random single zombies between waves
         // TODO: wave timeline visualization
         // TODO: specify types and probabilities of zombies in wave
-        //addObject(new ScoreBoard("HouseofTerror", 30), 300, 200);
-        //некоторые растения для тестов
+
+        // addObject(new ScoreBoard("HouseofTerror", 30), 300, 200);
+
+        // Некоторые растения для тестов
         level.growPlant(new SunFlower(reanimManager), 2, 0);
         level.growPlant(new SunFlower(reanimManager), 3, 0);
         level.growPlant(new PeaShooterRepeater(reanimManager), 1, 0);
@@ -73,25 +79,22 @@ public class MyWorld extends World {
         hitboxMap.toggleAttackBoxes(true);
         hitboxMap.toggleCellBoxes(true);
         addObject(hitboxMap, getWidth() / 2, getHeight() / 2);
-        setPaintOrder(CustomText.class,HitboxMap.class,Sun.class,LawnMower.class,PeaProjectile.class,PlantGhost.class,Zombie.class,Plant.class);
         started();
     }
-  private void registerCustomFont(String fileName) {
-    try {
-        File fontFile = new File(fileName);
-        if (fontFile.exists()) {
-            Font awtFont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
-            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(awtFont);
 
-          //  System.out.println("Шрифт " + awtFont.getName() + " успешно готов к работе!");
-        } else {
-           // System.out.println("Предупреждение: Файл шрифта '" + fileName + "' не найден. Будет использован стандартный шрифт.");
+    private void registerCustomFont(String fileName) {
+        try {
+            var fontFile = new File(fileName);
+            if (fontFile.exists()) {
+                var awtFont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
+                GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(awtFont);
+            } else {
+                System.err.println("Warning: Font file '" + fileName + "' not found");
+            }
+        } catch (Exception e) {
+            System.err.println("Error to register font: " + e);
         }
-        
-    } catch (Exception e) {
-      //  System.out.println("Не удалось зарегистрировать шрифт из-за внутренней ошибки чтения.");
     }
-}
 
     @Override
     public void stopped() {
