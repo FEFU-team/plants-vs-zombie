@@ -4,7 +4,7 @@ import java.awt.Rectangle;
 public class Sun extends AnimatedActor {
     private static final int SUN_VALUE = 25;
     private static final float FALL_SPEED = 70.f;
-    private static final int DISAPPEAR_TIME = 7;
+    private static final int DISAPPEAR_TIME = 8;
 
     private Timer lifeTimer = new Timer();
     private Timer fallTimer = new Timer();
@@ -66,10 +66,10 @@ public class Sun extends AnimatedActor {
         
         super.act();
 
-        if (falling) {
-            fall();
-        } else if (lifeTimer.getDeltaSeconds() >= DISAPPEAR_TIME) {
+        if (lifeTimer.getDeltaSeconds() >= DISAPPEAR_TIME) {
             disappear();
+        } else if (falling) {
+            fall();
         }
 
         checkClick();
@@ -89,10 +89,8 @@ public class Sun extends AnimatedActor {
     private void checkClick() {
         if (Greenfoot.mouseClicked(null)) {
             MouseInfo mouse = Greenfoot.getMouseInfo();
-            if (mouse != null) {
-                if (getHitbox().contains(mouse.getX(), mouse.getY())) {
-                    collect();
-                }
+            if (mouse != null && getHitbox().contains(mouse.getX(), mouse.getY())) {
+                collect();
             }
         }
     }

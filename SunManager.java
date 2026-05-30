@@ -2,7 +2,7 @@ import greenfoot.*;
 import java.util.Random;
 
 public class SunManager {
-    private static final int SPAWN_INTERVAL = 5;
+    private static final int SPAWN_INTERVAL = 10;
     private static final int MIN_X = 150;
     private static final int MAX_X = 900;
     private static final int START_Y = 0;
