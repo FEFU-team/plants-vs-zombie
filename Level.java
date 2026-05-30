@@ -273,16 +273,20 @@ public class Level {
         }
     }
     
-    public boolean isCellEmpty(int col, int row) {
+    public Plant getPlantAtCell(int col, int row) {
         var x = (int)(CELL_GRID_START_X + Cell.WIDTH * (col + 0.5f));
         var y = (int)(CELL_GRID_START_Y + Cell.HEIGHT * (row + 0.5f));
         
         for (var plant : world.getObjects(Plant.class)) {
             if (!plant.isGhost() && plant.getHitbox().contains(x, y)) {
-                return false;
+                return plant;
             }
         }
         
-        return true;
+        return null;
+    }
+    
+    public boolean isCellEmpty(int col, int row) {
+        return getPlantAtCell(col, row) == null;
     }
 }

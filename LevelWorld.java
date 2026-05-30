@@ -22,6 +22,7 @@ public class LevelWorld extends World {
             HitboxMap.class,
             ZombiesWon.class,
             CustomText.class,
+            Shovel.class,
             PlantGhost.class,
             PlantGhost.Transparent.class,
             Sun.class,
@@ -34,6 +35,8 @@ public class LevelWorld extends World {
         registerCustomFont("HouseofTerrorRegular.otf");
 
         this.reanimManager = reanimManager;
+        
+        sunManager = new SunManager(this, reanimManager);
 
         level = new Level(
             this,
@@ -62,8 +65,6 @@ public class LevelWorld extends World {
         level.growPlant(new SunFlower(reanimManager), 3, 3);
         level.growPlant(new SunFlower(reanimManager), 3, 4);
         level.growPlant(new Chomper(reanimManager), 4, 3);
-
-        sunManager = new SunManager(this, reanimManager);
         
         var seeds = new ArrayList<SeedType>();
         seeds.add(SeedType.SunFlower);
@@ -73,6 +74,9 @@ public class LevelWorld extends World {
         seeds.add(SeedType.PotatoMine);
         seeds.add(SeedType.Chomper);
         seedBank = new SeedBank(this, sunManager, reanimManager, seeds);
+        
+        addObject(new ShovelBank(reanimManager), ShovelBank.POSITION_X, ShovelBank.POSITION_Y);
+        addObject(new Shovel(reanimManager), Shovel.IN_BANK_POSITION_X, Shovel.IN_BANK_POSITION_Y);
         
         // Debug: draw hitboxes
         var hitboxMap = new HitboxMap();
@@ -138,13 +142,15 @@ public class LevelWorld extends World {
                     removeObject(selectedPlant);
                     removeObject(selectedPlantGhost);
                     
-                    var cell = level.getCellAt(mouse.getX(), mouse.getY());
-                    
-                    if (cell != null && level.isCellEmpty(cell.x, cell.y)) {
-                        var seedType = selectedPlant.getSeedType();
-                        sunManager.spendSun(seedType.getSunCost());
-                        seedBank.resetTimerForSeed(seedType);
-                        level.growPlant(seedType.create(reanimManager), cell.x, cell.y);
+                    if (mouse.getButton() == 1) {
+                        var cell = level.getCellAt(mouse.getX(), mouse.getY());
+                        
+                        if (cell != null && level.isCellEmpty(cell.x, cell.y)) {
+                            var seedType = selectedPlant.getSeedType();
+                            sunManager.spendSun(seedType.getSunCost());
+                            seedBank.resetTimerForSeed(seedType);
+                            level.growPlant(seedType.create(reanimManager), cell.x, cell.y);
+                        }
                     }
                     
                     selectedPlant = null;
@@ -156,7 +162,7 @@ public class LevelWorld extends World {
                     );
                     placeSelectedPlantGhost(mouse.getX(), mouse.getY());
                 }
-            } else if (Greenfoot.mousePressed(null)) {
+            } else if (Greenfoot.mousePressed(null) && mouse.getButton() == 1) {
                 var seedType = seedBank.getReadySeedAt(mouse.getX(), mouse.getY());
                 if (seedType != null) {
                     selectedPlant = new PlantGhost(reanimManager, seedType);

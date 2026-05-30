@@ -40,6 +40,8 @@ public class Sun extends AnimatedActor {
         super(reanimManager, "REANIM_SUN", "Sun1");
 
         this.targetY = targetY;
+        
+        setReanimSpeed(0.6f);
     }
 
     @Override
