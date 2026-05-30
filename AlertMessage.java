@@ -12,7 +12,7 @@ public class AlertMessage extends CustomText{
         super(text, FONT_NAME, FONT_SIZE, COLOR, lifeTime);
     }
 
-    public static void show(MyWorld world, String text, float lifeTime) {
+    public static void show(LevelWorld world, String text, float lifeTime) {
         world.addObject(new AlertMessage(text, lifeTime), POSITION_X, POSITION_Y);
     }
 }

@@ -63,7 +63,7 @@ public class Level {
     
     private static final float ZOMBIE_SPAWN_DELAY = 1.2f; 
     
-    private MyWorld world;
+    private LevelWorld world;
     private ReanimManager reanimManager;
     private Random random = new Random();
     private Style style;
@@ -75,7 +75,7 @@ public class Level {
     
     private Timer levelTimer = new Timer();
     
-    public Level(MyWorld world, ReanimManager reanimManager, List<Wave> waves) {
+    public Level(LevelWorld world, ReanimManager reanimManager, List<Wave> waves) {
         if (waves.isEmpty()) {
             throw new IllegalArgumentException("Level must have at least one wave");
         }

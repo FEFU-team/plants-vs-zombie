@@ -8,13 +8,13 @@ public class SunManager {
     private static final int START_Y = 0;
     private static final int GROUND_Y = 350;
 
-    private MyWorld world;
+    private LevelWorld world;
     private ReanimManager reanimManager;
     private int sunCount = 50;
     private Timer spawnTimer = new Timer();
     private Random random = new Random();
 
-    public SunManager(MyWorld world, ReanimManager reanimManager) {
+    public SunManager(LevelWorld world, ReanimManager reanimManager) {
         this.world = world;
         this.reanimManager = reanimManager;
     }

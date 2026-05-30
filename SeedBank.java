@@ -122,7 +122,7 @@ public class SeedBank {
     
     private static int SUN_BANK_WIDTH = 78;
 
-    private MyWorld world;
+    private LevelWorld world;
     private ReanimManager reanimManager;
     private SunManager sunManager;
     private GreenfootImage bankImage;
@@ -130,7 +130,7 @@ public class SeedBank {
     
     private List<Seed> seeds;
 
-    public SeedBank(MyWorld world, SunManager sunManager, ReanimManager reanimManager, List<SeedType> seeds) {
+    public SeedBank(LevelWorld world, SunManager sunManager, ReanimManager reanimManager, List<SeedType> seeds) {
         this.world = world;
         this.sunManager = sunManager;
         this.reanimManager = reanimManager;

@@ -6,7 +6,7 @@ import java.awt.Font;
 import java.io.File;
 import java.awt.GraphicsEnvironment;
 
-public class MyWorld extends World {
+public class LevelWorld extends World {
     private ReanimManager reanimManager;
     private SunManager sunManager;
     private SeedBank seedBank;
@@ -16,7 +16,7 @@ public class MyWorld extends World {
     private PlantGhost selectedPlant;
     private PlantGhost selectedPlantGhost;
 
-    public MyWorld(ReanimManager reanimManager) {
+    public LevelWorld(ReanimManager reanimManager) {
         super(1000, 600, 1);
         setPaintOrder(
             HitboxMap.class,
@@ -79,6 +79,7 @@ public class MyWorld extends World {
         hitboxMap.toggleAttackBoxes(true);
         hitboxMap.toggleCellBoxes(true);
         addObject(hitboxMap, getWidth() / 2, getHeight() / 2);
+        
         started();
     }
 

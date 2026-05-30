@@ -29,8 +29,8 @@ public class HitboxMap extends Actor {
             var img = getImage();
             img.clear();
             
-            if (showCellBoxes && world instanceof MyWorld myWorld) {
-                var level = myWorld.getLevel();
+            if (showCellBoxes && world instanceof LevelWorld levelWorld) {
+                var level = levelWorld.getLevel();
                 
                 var winBox = level.getWinHitbox();
                 img.setColor(Color.BLUE);

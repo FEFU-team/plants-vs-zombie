@@ -96,7 +96,7 @@ public class Sun extends AnimatedActor {
     }
 
     private void collect() {
-        var world = getWorldOfType(MyWorld.class);
+        var world = getWorldOfType(LevelWorld.class);
         if (world == null) return;
         
         SunManager manager = world.getSunManager();
