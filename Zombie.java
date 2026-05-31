@@ -132,7 +132,7 @@ public class Zombie extends AnimatedActor {
     }
     
     protected boolean isWinning() {
-        var world = getWorldOfType(MyWorld.class);
+        var world = getWorldOfType(LevelWorld.class);
         if (world == null) return false;
 
         return world.getLevel().getWinHitbox().intersects(getHitbox());

@@ -85,14 +85,6 @@ public class LawnMower extends AnimatedActor {
         for (Zombie zombie : world.getObjects(Zombie.class)) {
             if (hitbox.intersects(zombie.getHitbox())) {
                 zombie.takeDamage(999999);
-
-                // Создаем эффекты частиц
-                /*if (world instanceof MyWorld myWorld) {
-                    ParticleSystem ps = myWorld.getParticleSystem();
-                    if (ps != null) {
-                        ps.spawnMowerEffects(zombie.getRealX(), zombie.getRealY());
-                    }
-                }*/
             }
         }
     }

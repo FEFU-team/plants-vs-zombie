@@ -54,7 +54,7 @@ public abstract class BaseActor extends Actor {
     public void lifecycleStart() {}
     
     protected boolean gameIsStopped() {
-        if (getWorld() instanceof MyWorld world) {
+        if (getWorld() instanceof LevelWorld world) {
             return world.gameIsStopped();
         }
         return true;

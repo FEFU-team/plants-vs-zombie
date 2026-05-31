@@ -1,9 +1,11 @@
 import greenfoot.*;
+import java.awt.image.*;
 import java.awt.Rectangle;
 
 public class Plant extends AnimatedActor {
     protected float maxHealth;
     protected float health;
+    protected boolean highlight;
 
     @Override
     public float getHitboxWidth() {
@@ -59,5 +61,19 @@ public class Plant extends AnimatedActor {
     
     public boolean isGhost() {
         return false;
+    }
+    
+    @Override
+    public void setImage(GreenfootImage image) {
+        if (highlight && image != null) {
+            var op = new RescaleOp(1.1f, 20.f, null);
+            op.filter(image.getAwtImage(), image.getAwtImage());
+        }
+        
+        super.setImage(image);
+    }
+    
+    public void highlight(boolean highlight) {
+        this.highlight = highlight;
     }
 }

@@ -1,6 +1,4 @@
 import greenfoot.*;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 
 import java.io.File;
 
@@ -10,6 +8,7 @@ public class MainMenu extends World {
     public MainMenu()  {
         super(800, 600, 1);
         Greenfoot.setSpeed(50);
+        
         reanimManager.loadReanims("./reanim", "REANIM_");
         reanimManager.loadImages("./images", "IMAGE_");
         reanimManager.loadImages("./images/reanim", "IMAGE_REANIM_");
@@ -23,10 +22,8 @@ public class MainMenu extends World {
         
         selectorScreen.addButtonCallback(
             SelectorScreen.Button.StartAdventure,
-            () -> Greenfoot.setWorld(new MyWorld(reanimManager))
+            () -> Greenfoot.setWorld(new LevelWorld(reanimManager))
         );
-        
-        // TODO: maybe quit button is superfluous for Greenfoot
     }
 
     @Override

@@ -5,7 +5,8 @@ import java.util.stream.*;
 import java.awt.Font;
 import java.io.File;
 import java.awt.GraphicsEnvironment;
-public class MyWorld extends World {
+
+public class LevelWorld extends World {
     private ReanimManager reanimManager;
     private SunManager sunManager;
     private SeedBank seedBank;
@@ -15,11 +16,13 @@ public class MyWorld extends World {
     private PlantGhost selectedPlant;
     private PlantGhost selectedPlantGhost;
 
-    public MyWorld(ReanimManager reanimManager) {
+    public LevelWorld(ReanimManager reanimManager) {
         super(1000, 600, 1);
         setPaintOrder(
             HitboxMap.class,
             ZombiesWon.class,
+            CustomText.class,
+            Shovel.class,
             PlantGhost.class,
             PlantGhost.Transparent.class,
             Sun.class,
@@ -28,8 +31,12 @@ public class MyWorld extends World {
             Zombie.class,
             Plant.class
         );
-       registerCustomFont("HouseofTerrorRegular.otf");
+
+        registerCustomFont("HouseofTerrorRegular.otf");
+
         this.reanimManager = reanimManager;
+        
+        sunManager = new SunManager(this, reanimManager);
 
         level = new Level(
             this,
@@ -44,8 +51,10 @@ public class MyWorld extends World {
         // TODO: random single zombies between waves
         // TODO: wave timeline visualization
         // TODO: specify types and probabilities of zombies in wave
-        //addObject(new ScoreBoard("HouseofTerror", 30), 300, 200);
-        //некоторые растения для тестов
+
+        // addObject(new ScoreBoard("HouseofTerror", 30), 300, 200);
+
+        // Некоторые растения для тестов
         level.growPlant(new SunFlower(reanimManager), 2, 0);
         level.growPlant(new SunFlower(reanimManager), 3, 0);
         level.growPlant(new PeaShooterRepeater(reanimManager), 1, 0);
@@ -56,8 +65,6 @@ public class MyWorld extends World {
         level.growPlant(new SunFlower(reanimManager), 3, 3);
         level.growPlant(new SunFlower(reanimManager), 3, 4);
         level.growPlant(new Chomper(reanimManager), 4, 3);
-
-        sunManager = new SunManager(this, reanimManager);
         
         var seeds = new ArrayList<SeedType>();
         seeds.add(SeedType.SunFlower);
@@ -68,30 +75,31 @@ public class MyWorld extends World {
         seeds.add(SeedType.Chomper);
         seedBank = new SeedBank(this, sunManager, reanimManager, seeds);
         
+        addObject(new ShovelBank(reanimManager), ShovelBank.POSITION_X, ShovelBank.POSITION_Y);
+        addObject(new Shovel(reanimManager), Shovel.IN_BANK_POSITION_X, Shovel.IN_BANK_POSITION_Y);
+        
         // Debug: draw hitboxes
         var hitboxMap = new HitboxMap();
         hitboxMap.toggleAttackBoxes(true);
         hitboxMap.toggleCellBoxes(true);
         addObject(hitboxMap, getWidth() / 2, getHeight() / 2);
-        setPaintOrder(CustomText.class,HitboxMap.class,Sun.class,LawnMower.class,PeaProjectile.class,PlantGhost.class,Zombie.class,Plant.class);
+        
         started();
     }
-  private void registerCustomFont(String fileName) {
-    try {
-        File fontFile = new File(fileName);
-        if (fontFile.exists()) {
-            Font awtFont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
-            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(awtFont);
 
-          //  System.out.println("Шрифт " + awtFont.getName() + " успешно готов к работе!");
-        } else {
-           // System.out.println("Предупреждение: Файл шрифта '" + fileName + "' не найден. Будет использован стандартный шрифт.");
+    private void registerCustomFont(String fileName) {
+        try {
+            var fontFile = new File(fileName);
+            if (fontFile.exists()) {
+                var awtFont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
+                GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(awtFont);
+            } else {
+                System.err.println("Warning: Font file '" + fileName + "' not found");
+            }
+        } catch (Exception e) {
+            System.err.println("Error to register font: " + e);
         }
-        
-    } catch (Exception e) {
-      //  System.out.println("Не удалось зарегистрировать шрифт из-за внутренней ошибки чтения.");
     }
-}
 
     @Override
     public void stopped() {
@@ -134,13 +142,15 @@ public class MyWorld extends World {
                     removeObject(selectedPlant);
                     removeObject(selectedPlantGhost);
                     
-                    var cell = level.getCellAt(mouse.getX(), mouse.getY());
-                    
-                    if (cell != null && level.isCellEmpty(cell.x, cell.y)) {
-                        var seedType = selectedPlant.getSeedType();
-                        sunManager.spendSun(seedType.getSunCost());
-                        seedBank.resetTimerForSeed(seedType);
-                        level.growPlant(seedType.create(reanimManager), cell.x, cell.y);
+                    if (mouse.getButton() == 1) {
+                        var cell = level.getCellAt(mouse.getX(), mouse.getY());
+                        
+                        if (cell != null && level.isCellEmpty(cell.x, cell.y)) {
+                            var seedType = selectedPlant.getSeedType();
+                            sunManager.spendSun(seedType.getSunCost());
+                            seedBank.resetTimerForSeed(seedType);
+                            level.growPlant(seedType.create(reanimManager), cell.x, cell.y);
+                        }
                     }
                     
                     selectedPlant = null;
@@ -152,7 +162,7 @@ public class MyWorld extends World {
                     );
                     placeSelectedPlantGhost(mouse.getX(), mouse.getY());
                 }
-            } else if (Greenfoot.mousePressed(null)) {
+            } else if (Greenfoot.mousePressed(null) && mouse.getButton() == 1) {
                 var seedType = seedBank.getReadySeedAt(mouse.getX(), mouse.getY());
                 if (seedType != null) {
                     selectedPlant = new PlantGhost(reanimManager, seedType);

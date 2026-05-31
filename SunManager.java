@@ -2,19 +2,19 @@ import greenfoot.*;
 import java.util.Random;
 
 public class SunManager {
-    private static final int SPAWN_INTERVAL = 5;
+    private static final int SPAWN_INTERVAL = 10;
     private static final int MIN_X = 150;
     private static final int MAX_X = 900;
     private static final int START_Y = 0;
     private static final int GROUND_Y = 350;
 
-    private MyWorld world;
+    private LevelWorld world;
     private ReanimManager reanimManager;
     private int sunCount = 50;
     private Timer spawnTimer = new Timer();
     private Random random = new Random();
 
-    public SunManager(MyWorld world, ReanimManager reanimManager) {
+    public SunManager(LevelWorld world, ReanimManager reanimManager) {
         this.world = world;
         this.reanimManager = reanimManager;
     }

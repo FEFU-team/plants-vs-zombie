@@ -2,7 +2,7 @@ import greenfoot.*;
 import java.awt.Rectangle;
 
 public class SunFlower extends Plant {
-    private static final int SUN_SPAWN_INTERVAL = 15;
+    private static final int SUN_SPAWN_INTERVAL = 24;
     
     private Timer sunSpawnTimer = new Timer();
     

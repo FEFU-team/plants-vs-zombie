@@ -58,13 +58,12 @@ public class Level {
     
     public static final int CELL_GRID_START_X = 260;
     public static final int CELL_GRID_START_Y = 80;
-    public static final String myFont = "HouseofTerror";
     private static final int WAVE_APPROACH_MESSAGE_INTERVAL = 5;
     private static final int WAVE_MESSAGE_HIDE_INTERVAL = 5;
     
     private static final float ZOMBIE_SPAWN_DELAY = 1.2f; 
     
-    private MyWorld world;
+    private LevelWorld world;
     private ReanimManager reanimManager;
     private Random random = new Random();
     private Style style;
@@ -76,7 +75,7 @@ public class Level {
     
     private Timer levelTimer = new Timer();
     
-    public Level(MyWorld world, ReanimManager reanimManager, List<Wave> waves) {
+    public Level(LevelWorld world, ReanimManager reanimManager, List<Wave> waves) {
         if (waves.isEmpty()) {
             throw new IllegalArgumentException("Level must have at least one wave");
         }
@@ -107,10 +106,6 @@ public class Level {
         tryToSpawnZombieWave();
         trySpawnNextZombie();
         
-        if (currentWaveIdx >= waves.size() - 1 && levelTimer.getDeltaSeconds() > waves.get(currentWaveIdx).startsAt + WAVE_MESSAGE_HIDE_INTERVAL) {
-            world.showText("", 500, 200);
-        }
-        
         checkGameStatus();
     }
 
@@ -119,17 +114,12 @@ public class Level {
          
         if (levelTimer.getDeltaSeconds() < waves.get(currentWaveIdx + 1).startsAt) {
             if (levelTimer.getDeltaSeconds() > waves.get(currentWaveIdx + 1).startsAt - WAVE_APPROACH_MESSAGE_INTERVAL) {
-            world.addObject(new CustomText("A Wave of Zombies is Approaching", myFont, 30, Color.RED), 600,250);
-            } else if (currentWaveIdx >= 0 && levelTimer.getDeltaSeconds() > waves.get(currentWaveIdx).startsAt + WAVE_MESSAGE_HIDE_INTERVAL) {
-                //world.showText("", 500, 200);
-                world.addObject(new CustomText("", myFont, 30, Color.RED), 600,250);
+                AlertMessage.show(world, "A HUGE WAVE OF ZOMBIES IS APPROACHING!", WAVE_MESSAGE_HIDE_INTERVAL);
             }
             return;
         }
         
         ++currentWaveIdx;
-        world.addObject(new CustomText("The wave " + (currentWaveIdx + 1) + " has begun!", myFont, 30, Color.RED), 600,250);
-        //world.showText("The wave " + (currentWaveIdx + 1) + " has begun!", 500, 200);
         nextZombieSpawnTime = levelTimer.getDeltaSeconds() + ZOMBIE_SPAWN_DELAY;
     }
     
@@ -229,8 +219,8 @@ public class Level {
         if (zombies.isEmpty()) {
             var lastWave = waves.getLast();
             if (lastWave.zombiesSpawned == lastWave.totalZombies) {
-                //world.showText("Victory!", 500, 300);
-                world.addObject(new CustomText("Victory!", myFont, 30, Color.RED), 600,250);
+                // TODO: add normal victory animation
+                AlertMessage.show(world, "Victory!", Float.POSITIVE_INFINITY);
                 Greenfoot.stop();
             }
         }
@@ -283,16 +273,20 @@ public class Level {
         }
     }
     
-    public boolean isCellEmpty(int col, int row) {
+    public Plant getPlantAtCell(int col, int row) {
         var x = (int)(CELL_GRID_START_X + Cell.WIDTH * (col + 0.5f));
         var y = (int)(CELL_GRID_START_Y + Cell.HEIGHT * (row + 0.5f));
         
         for (var plant : world.getObjects(Plant.class)) {
             if (!plant.isGhost() && plant.getHitbox().contains(x, y)) {
-                return false;
+                return plant;
             }
         }
         
-        return true;
+        return null;
+    }
+    
+    public boolean isCellEmpty(int col, int row) {
+        return getPlantAtCell(col, row) == null;
     }
 }
