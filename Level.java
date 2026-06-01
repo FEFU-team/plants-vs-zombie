@@ -8,18 +8,50 @@ public class Level {
         private int totalZombies;
         private int zombiesSpawned;
         private float startsAt;
+        private float spawnDelay;
+        private boolean isHugeWave;
+        private ZombieType forcedType;
         
-        Wave(int totalZombies, float startsAt) {
+        Wave(int totalZombies, float startsAt, float spawnDelay, boolean isHugeWave) {
             this.totalZombies = totalZombies;
             this.startsAt = startsAt;
+            this.spawnDelay = spawnDelay;
+            this.isHugeWave = isHugeWave;
+            this.forcedType = null;
+        }
+        
+        Wave(int totalZombies, float startsAt, float spawnDelay, boolean isHugeWave, ZombieType forcedType) {
+            this(totalZombies, startsAt, spawnDelay, isHugeWave);
+            this.forcedType = forcedType;
         }
     }
     
     public static class WavesBuilder {
         private final List<Wave> waves = new ArrayList<>();
         
+        public WavesBuilder addScout(float startsAt) {
+            waves.add(new Wave(1, startsAt, 5.0f, false));
+            return this;
+        }
+        
+        public WavesBuilder addBasicScout(float startsAt) {
+            waves.add(new Wave(1, startsAt, 5.0f, false, ZombieType.Basic));
+            return this;
+        }
+        
+        public WavesBuilder addGroup(int totalZombies, float startsAt, float spawnDelay) {
+            waves.add(new Wave(totalZombies, startsAt, spawnDelay, false));
+            return this;
+        }
+        
+
+        public WavesBuilder addHugeWave(int totalZombies, float startsAt, float spawnDelay) {
+            waves.add(new Wave(totalZombies, startsAt, spawnDelay, true));
+            return this;
+        }
+
         public WavesBuilder addWave(int totalZombies, float startsAt) {
-            waves.add(new Wave(totalZombies, startsAt));
+            waves.add(new Wave(totalZombies, startsAt, 1.5f, false));
             return this;
         }
         
@@ -60,8 +92,7 @@ public class Level {
     public static final int CELL_GRID_START_Y = 80;
     private static final int WAVE_APPROACH_MESSAGE_INTERVAL = 5;
     private static final int WAVE_MESSAGE_HIDE_INTERVAL = 5;
-    
-    private static final float ZOMBIE_SPAWN_DELAY = 1.2f; 
+    private static final float WAVE_FIRST_ZOMBIE_DELAY = 1.0f;
     
     private LevelWorld world;
     private ReanimManager reanimManager;
@@ -111,16 +142,20 @@ public class Level {
 
     private void tryToSpawnZombieWave() {
         if (currentWaveIdx >= waves.size() - 1) return;
+        
+        Wave nextWave = waves.get(currentWaveIdx + 1);
+        float timeUntilNext = nextWave.startsAt - levelTimer.getDeltaSeconds();
          
-        if (levelTimer.getDeltaSeconds() < waves.get(currentWaveIdx + 1).startsAt) {
-            if (levelTimer.getDeltaSeconds() > waves.get(currentWaveIdx + 1).startsAt - WAVE_APPROACH_MESSAGE_INTERVAL) {
+        if (timeUntilNext > 0) {
+            // Показываем предупреждение только для волн с флагом isHugeWave
+            if (nextWave.isHugeWave && timeUntilNext <= WAVE_APPROACH_MESSAGE_INTERVAL) {
                 AlertMessage.show(world, "A HUGE WAVE OF ZOMBIES IS APPROACHING!", WAVE_MESSAGE_HIDE_INTERVAL);
             }
             return;
         }
         
         ++currentWaveIdx;
-        nextZombieSpawnTime = levelTimer.getDeltaSeconds() + ZOMBIE_SPAWN_DELAY;
+        nextZombieSpawnTime = levelTimer.getDeltaSeconds() + WAVE_FIRST_ZOMBIE_DELAY;
     }
     
     private void trySpawnNextZombie() {
@@ -132,13 +167,17 @@ public class Level {
         if (levelTimer.getDeltaSeconds() >= nextZombieSpawnTime) {
             spawnSingleZombie(currentWave);
             currentWave.zombiesSpawned++;
-            nextZombieSpawnTime += ZOMBIE_SPAWN_DELAY;
+            nextZombieSpawnTime += currentWave.spawnDelay;
         }
     }
 
     private void spawnSingleZombie(Wave wave) {
         ZombieType[] types = ZombieType.values();
-        Zombie zombie = switch (types[random.nextInt(types.length)]) {
+        ZombieType type = wave.forcedType != null
+            ? wave.forcedType
+            : types[random.nextInt(types.length)];
+        
+        Zombie zombie = switch (type) {
             case Basic -> new BasicZombie(reanimManager);
             case WithCone -> new ZombieWithCone(reanimManager);
             case Polevaulter -> new ZombiePolevaulter(reanimManager);

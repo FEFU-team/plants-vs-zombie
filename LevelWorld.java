@@ -42,8 +42,19 @@ public class LevelWorld extends World {
             this,
             reanimManager,
             new Level.WavesBuilder()
-                .addWave(6, 5.f)
-                .addWave(10, 40.f)
+                // Волна 1 — одиночный зомби-разведчик
+                .addBasicScout(20.f)
+                // Волна 2 — ещё один одиночный, чуть позже
+                .addBasicScout(45.f)
+                .addBasicScout(80.f)
+                .addBasicScout(120.f)
+                .addBasicScout(120.f)
+                // Волна 3 — двое с небольшой паузой между ними
+                .addGroup(2, 160.f, 6.0f)
+                // Волна 4 — тройка зомби потоком
+                .addGroup(3, 200.f, 3.5f)
+                // Волна 5 — HUGE WAVE, много зомби плотным потоком
+                .addHugeWave(10, 250.f, 1.5f)
                 .build()
         );
         level.setStyle(Level.Style.GARDEN_DAY);
@@ -55,7 +66,7 @@ public class LevelWorld extends World {
         // addObject(new ScoreBoard("HouseofTerror", 30), 300, 200);
 
         // Некоторые растения для тестов
-        level.growPlant(new SunFlower(reanimManager), 2, 0);
+       /* level.growPlant(new SunFlower(reanimManager), 2, 0);
         level.growPlant(new SunFlower(reanimManager), 3, 0);
         level.growPlant(new PeaShooterRepeater(reanimManager), 1, 0);
         level.growPlant(new PeaShooter(reanimManager), 2, 1);
@@ -64,7 +75,7 @@ public class LevelWorld extends World {
         level.growPlant(new SunFlower(reanimManager), 3, 2);
         level.growPlant(new SunFlower(reanimManager), 3, 3);
         level.growPlant(new SunFlower(reanimManager), 3, 4);
-        level.growPlant(new Chomper(reanimManager), 4, 3);
+        level.growPlant(new Chomper(reanimManager), 4, 3);*/
         
         var seeds = new ArrayList<SeedType>();
         seeds.add(SeedType.SunFlower);
