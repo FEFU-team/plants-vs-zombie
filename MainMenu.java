@@ -24,6 +24,19 @@ public class MainMenu extends World {
             SelectorScreen.Button.StartAdventure,
             () -> Greenfoot.setWorld(new LevelWorld(reanimManager))
         );
+        
+        selectorScreen.addButtonCallback(
+            SelectorScreen.Button.Help,
+            () -> {
+                if (this.getObjects(HelpScreen.class).isEmpty()) {
+                    this.addObject(new HelpScreen(), this.getWidth() / 2, this.getHeight() / 2);
+                }
+            }
+        );
+        
+        selectorScreen.setOnOpenAnimationFinished(() -> {
+            selectorScreen.showButton(SelectorScreen.Button.Help);
+        });
     }
 
     @Override
