@@ -40,10 +40,9 @@ public class HelpScreen extends Actor {
             "Кликни в любое место, чтобы закрыть."
         };
         
-        int x = 40;
         int y = 90;
         for (String line : lines) {
-            image.drawString(line, x, y);
+            image.drawString(line, 40, y);
             y += 24;
         }
         

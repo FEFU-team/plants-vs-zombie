@@ -48,7 +48,6 @@ public class SelectorScreen extends AnimatedActor {
     private Button currentHoveredButton;
     private Runnable onOpenFinishedCallback;
     
-    private boolean helpVisible = false;
     private boolean helpHovered = false;
     private static final int HELP_X = 740;
     private static final int HELP_Y = 520;
@@ -79,16 +78,12 @@ public class SelectorScreen extends AnimatedActor {
     public void hideButton(Button button) {
         if (!shownButtons.contains(button)) return;
         
-        if (button == Button.Help) {
-            helpVisible = false;
-            shownButtons.remove(button);
-            return;
+        if (button != Button.Help) {
+            var reanimTrackButtonName = button.getReanimTrackButtonName();
+            
+            hideLayer("SelectorScreen_" + reanimTrackButtonName + "_shadow");
+            hideLayer("SelectorScreen_" + reanimTrackButtonName + "_button");
         }
-        
-        var reanimTrackButtonName = button.getReanimTrackButtonName();
-        
-        hideLayer("SelectorScreen_" + reanimTrackButtonName + "_shadow");
-        hideLayer("SelectorScreen_" + reanimTrackButtonName + "_button");
         
         shownButtons.remove(button);
     }
@@ -96,16 +91,12 @@ public class SelectorScreen extends AnimatedActor {
     public void showButton(Button button) {
         if (shownButtons.contains(button)) return;
         
-        if (button == Button.Help) {
-            helpVisible = true;
-            shownButtons.add(button);
-            return;
+        if (button != Button.Help) {
+            var reanimTrackButtonName = button.getReanimTrackButtonName();
+        
+            unhideLayer("SelectorScreen_" + reanimTrackButtonName + "_shadow");
+            unhideLayer("SelectorScreen_" + reanimTrackButtonName + "_button");
         }
-        
-        var reanimTrackButtonName = button.getReanimTrackButtonName();
-        
-        unhideLayer("SelectorScreen_" + reanimTrackButtonName + "_shadow");
-        unhideLayer("SelectorScreen_" + reanimTrackButtonName + "_button");
         
         shownButtons.add(button);
     }
@@ -184,18 +175,25 @@ public class SelectorScreen extends AnimatedActor {
                 if (callback != null) callback.run();
             }
         }
-        
+    }
+
+    @Override
+    public void updateFrame() {
+        super.updateFrame();
+
         drawHelpButton();
     }
     
     private void drawHelpButton() {
-        if (!helpVisible) return;
+        if (shownButtons != null && !shownButtons.contains(Button.Help)) return;
         
         String key = helpHovered ? Button.Help.getActiveImageKey() : Button.Help.getInactiveImageKey();
         var sprite = reanimManager.getImage(key);
         if (sprite == null) return;
         
         var canvas = getImage();
+        if (canvas == null) return;
+        
         int originX = canvas.getWidth() / 2;
         int originY = canvas.getHeight() / 2;
         
