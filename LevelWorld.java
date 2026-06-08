@@ -22,10 +22,10 @@ public class LevelWorld extends World {
             HitboxMap.class,
             ZombiesWon.class,
             CustomText.class,
-            Shovel.class,
             PlantGhost.class,
             PlantGhost.Transparent.class,
             Sun.class,
+            Shovel.class,
             PeaProjectile.class,
             LawnMower.class,
             Zombie.class,
@@ -59,23 +59,10 @@ public class LevelWorld extends World {
         );
         level.setStyle(Level.Style.GARDEN_DAY);
         level.createLawn();
+        
         // TODO: random single zombies between waves
         // TODO: wave timeline visualization
         // TODO: specify types and probabilities of zombies in wave
-
-        // addObject(new ScoreBoard("HouseofTerror", 30), 300, 200);
-
-        // Некоторые растения для тестов
-       /* level.growPlant(new SunFlower(reanimManager), 2, 0);
-        level.growPlant(new SunFlower(reanimManager), 3, 0);
-        level.growPlant(new PeaShooterRepeater(reanimManager), 1, 0);
-        level.growPlant(new PeaShooter(reanimManager), 2, 1);
-        level.growPlant(new SunFlower(reanimManager), 3, 1);
-        level.growPlant(new PeaShooterRepeater(reanimManager), 2, 2);
-        level.growPlant(new SunFlower(reanimManager), 3, 2);
-        level.growPlant(new SunFlower(reanimManager), 3, 3);
-        level.growPlant(new SunFlower(reanimManager), 3, 4);
-        level.growPlant(new Chomper(reanimManager), 4, 3);*/
         
         var seeds = new ArrayList<SeedType>();
         seeds.add(SeedType.SunFlower);
@@ -90,10 +77,10 @@ public class LevelWorld extends World {
         addObject(new Shovel(reanimManager), Shovel.IN_BANK_POSITION_X, Shovel.IN_BANK_POSITION_Y);
         
         // Debug: draw hitboxes
-        var hitboxMap = new HitboxMap();
-        hitboxMap.toggleAttackBoxes(true);
-        hitboxMap.toggleCellBoxes(true);
-        addObject(hitboxMap, getWidth() / 2, getHeight() / 2);
+        // var hitboxMap = new HitboxMap();
+        // hitboxMap.toggleAttackBoxes(true);
+        // hitboxMap.toggleCellBoxes(true);
+        // addObject(hitboxMap, getWidth() / 2, getHeight() / 2);
         
         started();
     }
